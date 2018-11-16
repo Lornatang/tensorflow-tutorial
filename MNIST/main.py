@@ -1,10 +1,14 @@
 from model import *
 
 import tensorflow as tf
+import os
 
 from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets("./data/mnist", one_hot=True)
 
+
+if not os.path.exists('./checkpoint_dir'):
+    os.makedirs('./checkpoint_dir')
 
 # define network hyper parameters
 learning_rate = 0.001
@@ -23,7 +27,7 @@ pred = train(X, weights, biases, keep_prob)
 
 # 定义损失函数和学习步骤
 cost = tf.reduce_mean(
-    tf.nn.softmax_cross_entropy_with_logits(
+    tf.nn.softmax_cross_entropy_with_logits_v2(
         logits=pred, labels=y))
 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
 
@@ -31,10 +35,12 @@ optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
 correct_pred = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
 
+# Save model
+saver = tf.train.Saver()
+
 # 开启一个训练
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer)
-    step = 1
     # Keep training until reach max iterations
     for epoch in range(10):
         batch_xs, batch_ys = mnist.train.next_batch(batch_size)
@@ -64,5 +70,7 @@ with tf.Session() as sess:
                 loss) + ", Training Accuracy = " + "{:.5f}".format(acc))
     print("Optimization Finished!")
     # 计算测试精度
+    saver.save(sess, './checkpoint_dir/mnist.ckpt')
+    print("Model save to 'checkpoint_dir/mnist.ckpt'")
     print("Testing Accuracy:",
           sess.run(accuracy, feed_dict={X: mnist.test.images[:256], y: mnist.test.labels[:256], keep_prob: 1.}))
