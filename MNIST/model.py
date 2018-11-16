@@ -9,23 +9,10 @@ from utils import *
 import tensorflow as tf
 
 
-flags = tf.flags
-# define network hyper parameters
-learning_rate = 0.001
-training_iters = 200000
-display_step = 20
-
 # define network parameters
 n_input = 784  # 输入的维度
 n_classes = 10  # 标签的维度
 dropout = 0.75  # Dropout 的概率
-
-FLAGS = flags.FLAGS
-
-# 占位符输入
-X = tf.placeholder(tf.float32, [None, n_input])
-y = tf.placeholder(tf.float32, [None, n_classes])
-keep_prob = tf.placeholder(tf.float32)
 
 
 # 存储所有的网络参数
@@ -52,13 +39,13 @@ biases = {
 
 
 # 定义整个网络
-def train(X, _weights, _biases, _dropout):
+def train(_x, _weights, _biases, _dropout):
     # 向量转为矩阵
-    X = tf.reshape(X, shape=[-1, 28, 28, 1])
+    _X = tf.reshape(_x, shape=[-1, 28, 28, 1])
 
     # 第一层卷积
     # 卷积
-    conv1 = conv2d('conv1', X, _weights['wc1'], _biases['bc1'])
+    conv1 = conv2d('conv1', _X, _weights['wc1'], _biases['bc1'])
     # 下采样
     pool1 = max_pool('pool1', conv1, k=2)
     # 归一化
@@ -104,8 +91,7 @@ def train(X, _weights, _biases, _dropout):
     dense1 = tf.nn.dropout(dense1, _dropout)
 
     # 全连接层2
-    dense2 = tf.reshape(
-        dense1, [-1, _weights['wd2'].get_shape().as_list()[0]])
+    dense2 = tf.reshape(dense1, [-1, _weights['wd2'].get_shape().as_list()[0]])
     dense2 = tf.nn.relu(
         tf.matmul(
             dense1,

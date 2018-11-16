@@ -2,9 +2,24 @@ from model import *
 
 import tensorflow as tf
 
+from tensorflow.examples.tutorials.mnist import input_data
+mnist = input_data.read_data_sets("./data/mnist", one_hot=True)
+
+
+# define network hyper parameters
+learning_rate = 0.001
+training_iters = 200000
+display_epoch = 2
+batch_size = 64
+
+# 占位符输入
+X = tf.placeholder(tf.float32, [None, n_input])
+y = tf.placeholder(tf.float32, [None, n_classes])
+keep_prob = tf.placeholder(tf.float32)
+
 
 # 构建模型
-pred = train(x, weights, biases, keep_prob)
+pred = train(X, weights, biases, keep_prob)
 
 # 定义损失函数和学习步骤
 cost = tf.reduce_mean(
@@ -16,15 +31,12 @@ optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
 correct_pred = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
 
-# 初始化所有的共享变量
-init = tf.initialize_all_variables()
-
 # 开启一个训练
 with tf.Session() as sess:
-    sess.run(init)
+    sess.run(tf.global_variables_initializer)
     step = 1
     # Keep training until reach max iterations
-    while step * batch_size < training_iters:
+    for epoch in range(10):
         batch_xs, batch_ys = mnist.train.next_batch(batch_size)
         # 获取批数据
         sess.run(
@@ -33,7 +45,7 @@ with tf.Session() as sess:
                 X: batch_xs,
                 y: batch_ys,
                 keep_prob: dropout})
-        if step % display_step == 0:
+        if epoch % display_epoch == 0:
             # 计算精度
             acc = sess.run(
                 accuracy,
@@ -50,7 +62,6 @@ with tf.Session() as sess:
                     keep_prob: 1.})
             print("Iter " + str(step * batch_size) + ", Minibatch Loss = " + "{:.6f}".format(
                 loss) + ", Training Accuracy = " + "{:.5f}".format(acc))
-        step += 1
     print("Optimization Finished!")
     # 计算测试精度
     print("Testing Accuracy:",
