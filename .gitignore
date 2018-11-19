@@ -106,3 +106,7 @@ data/*
 .idea/*
 *.DS_Store
 *.gz
+mnist/checkpoint_dir/checkpoint
+*.data-00000-of-00001
+*.index
+*.meta
