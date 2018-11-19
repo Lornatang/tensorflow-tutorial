@@ -12,9 +12,8 @@ if not os.path.exists('./checkpoint_dir'):
 
 # define network hyper parameters
 learning_rate = 0.001
-training_iters = 200000
-display_epoch = 2
-batch_size = 64
+epochs = 10
+batch_size = 128
 
 # 占位符输入
 X = tf.placeholder(tf.float32, [None, n_input])
@@ -40,9 +39,10 @@ saver = tf.train.Saver()
 
 # 开启一个训练
 with tf.Session() as sess:
-    sess.run(tf.global_variables_initializer)
-    # Keep training until reach max iterations
-    for epoch in range(10):
+    # init all global variables.
+    sess.run(tf.global_variables_initializer())
+    step = 0
+    for epoch in range(epochs):
         batch_xs, batch_ys = mnist.train.next_batch(batch_size)
         # 获取批数据
         sess.run(
@@ -51,23 +51,26 @@ with tf.Session() as sess:
                 X: batch_xs,
                 y: batch_ys,
                 keep_prob: dropout})
-        if epoch % display_epoch == 0:
-            # 计算精度
-            acc = sess.run(
-                accuracy,
-                feed_dict={
-                    X: batch_xs,
-                    y: batch_ys,
-                    keep_prob: 1.})
-            # 计算损失值
-            loss = sess.run(
-                cost,
-                feed_dict={
-                    X: batch_xs,
-                    y: batch_ys,
-                    keep_prob: 1.})
-            print("Iter " + str(step * batch_size) + ", Minibatch Loss = " + "{:.6f}".format(
-                loss) + ", Training Accuracy = " + "{:.5f}".format(acc))
+        # 计算精度
+        acc = sess.run(
+            accuracy,
+            feed_dict={
+                X: batch_xs,
+                y: batch_ys,
+                keep_prob: 1.})
+        # 计算损失值
+        loss = sess.run(
+            cost,
+            feed_dict={
+                X: batch_xs,
+                y: batch_ys,
+                keep_prob: 1.})
+        step += 1
+        # formatted output values.
+        print(f"Epoch [{epoch}/{epochs}]"
+              f"Iter [{step * batch_size}]"
+              f"Loss {loss:.6f}"
+              f"Acc {acc:.8f}")
     print("Optimization Finished!")
     # 计算测试精度
     saver.save(sess, './checkpoint_dir/mnist.ckpt')
