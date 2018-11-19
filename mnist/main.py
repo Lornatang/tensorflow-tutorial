@@ -12,7 +12,7 @@ if not os.path.exists('./checkpoint_dir'):
 
 # define network hyper parameters
 learning_rate = 0.001
-epochs = 10
+iters = 200000
 batch_size = 128
 
 # 占位符输入
@@ -41,8 +41,7 @@ saver = tf.train.Saver()
 with tf.Session() as sess:
     # init all global variables.
     sess.run(tf.global_variables_initializer())
-    step = 0
-    for epoch in range(epochs):
+    for Iter in range(iters):
         batch_xs, batch_ys = mnist.train.next_batch(batch_size)
         # 获取批数据
         sess.run(
@@ -65,11 +64,9 @@ with tf.Session() as sess:
                 X: batch_xs,
                 y: batch_ys,
                 keep_prob: 1.})
-        step += 1
         # formatted output values.
-        print(f"Epoch [{epoch}/{epochs}]"
-              f"Iter [{step * batch_size}]"
-              f"Loss {loss:.6f}"
+        print(f"Epoch [{Iter * batch_size}/{iters}] "
+              f"Loss {loss:.6f} "
               f"Acc {acc:.8f}")
     print("Optimization Finished!")
     # 计算测试精度
