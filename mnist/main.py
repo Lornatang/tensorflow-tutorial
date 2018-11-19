@@ -12,7 +12,7 @@ if not os.path.exists('./checkpoint_dir'):
 
 # define network hyper parameters
 learning_rate = 0.001
-iters = 200000
+iters = 55000
 batch_size = 128
 
 # 占位符输入
