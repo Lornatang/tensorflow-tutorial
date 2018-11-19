@@ -68,9 +68,12 @@ with tf.Session() as sess:
         print(f"Epoch [{Iter * batch_size}/{iters}] "
               f"Loss {loss:.6f} "
               f"Acc {acc:.8f}")
+        if acc > 0.99:
+            saver.save(sess, './checkpoint_dir/mnist.ckpt')
+            print("Model save to 'checkpoint_dir/mnist.ckpt', Break loop")
+            break
     print("Optimization Finished!")
     # 计算测试精度
-    saver.save(sess, './checkpoint_dir/mnist.ckpt')
-    print("Model save to 'checkpoint_dir/mnist.ckpt'")
+    
     print("Testing Accuracy:",
           sess.run(accuracy, feed_dict={X: mnist.test.images[:256], y: mnist.test.labels[:256], keep_prob: 1.}))
