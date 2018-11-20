@@ -32,7 +32,7 @@ FLAGS = None
 
 
 def data_type():
-    """Return the value of the activations, weight, andplaceholder variables."""
+    """Return the type of the activations, weights, and placeholder variables."""
     if FLAGS.use_fp16:
         return tf.float16
     else:
@@ -111,12 +111,12 @@ def main(_):
     train_size = train_labels.shape[0]
     X = tf.placeholder(
         data_type(),
-        shape=(
+        shape=[
             BATCH_SIZE,
             IMAGE_SIZE,
             IMAGE_SIZE,
-            NUM_CHANNELS))
-    y = tf.placeholder(tf.int64, shape=(BATCH_SIZE, ))
+            NUM_CHANNELS])
+    y = tf.placeholder(tf.int64, shape=[BATCH_SIZE, ])
     eval_data = tf.placeholder(data_type(),
                                shape=(EVAL_BATCH_SIZE,
                                       IMAGE_SIZE,
@@ -124,22 +124,22 @@ def main(_):
                                       NUM_CHANNELS))
 
     # The variables below hold all the trainable weights.
-    conv1_weights = tf.Variable(tf.truncated_normal([11, 11, NUM_CHANNELS, 96],
+    conv1_weights = tf.Variable(tf.truncated_normal([11, 11, NUM_CHANNELS, 64],
                                                     stddev=0.1,
                                                     seed=SEED,
                                                     dtype=data_type()))
     conv1_biasses = tf.Variable(
-        tf.zeros([96], dtype=data_type()))
-    conv2_weights = tf.Variable(tf.truncated_normal([5, 5, 96, 256],
+        tf.zeros([64], dtype=data_type()))
+    conv2_weights = tf.Variable(tf.truncated_normal([5, 5, 64, 192],
                                                     stddev=0.1,
                                                     seed=SEED,
                                                     dtype=data_type()))
     conv2_biasses = tf.Variable(
         tf.constant(
             0.1,
-            shape=[256],
+            shape=[192],
             dtype=data_type()))
-    conv3_weights = tf.Variable(tf.truncated_normal([3, 3, 256, 384],
+    conv3_weights = tf.Variable(tf.truncated_normal([3, 3, 192, 384],
                                                     stddev=0.1,
                                                     seed=SEED,
                                                     dtype=data_type()))
@@ -176,16 +176,16 @@ def main(_):
             0.1,
             shape=[4096],
             dtype=data_type()))
-    fc2_weights = tf.Variable(tf.truncated_normal([4096, 1024],
+    fc2_weights = tf.Variable(tf.truncated_normal([4096, 4096],
                                                   stddev=0.1,
                                                   seed=SEED,
                                                   dtype=data_type()))
     fc2_biases = tf.Variable(
         tf.constant(
             0.1,
-            shape=[1024],
+            shape=[4096],
             dtype=data_type()))
-    fc3_weights = tf.Variable(tf.truncated_normal([1024, NUM_LABELS],
+    fc3_weights = tf.Variable(tf.truncated_normal([4096, NUM_LABELS],
                                                   stddev=0.1,
                                                   seed=SEED,
                                                   dtype=data_type()))
@@ -211,7 +211,7 @@ def main(_):
                               strides=[1, 2, 2, 1],
                               padding='SAME')
         norm = tf.nn.lrn(pool,
-                         depth_radius=4,
+                         4,
                          bias=1.0,
                          alpha=0.001 / 9.0,
                          beta=0.75)
@@ -228,7 +228,7 @@ def main(_):
                               strides=[1, 2, 2, 1],
                               padding='SAME')
         norm = tf.nn.lrn(pool,
-                         depth_radius=4,
+                         4,
                          bias=1.0,
                          alpha=0.001 / 9.0,
                          beta=0.75)
@@ -239,13 +239,8 @@ def main(_):
                             padding='SAME')
         # Bias and rectified linear non_linearity.
         relu = tf.nn.relu(tf.nn.bias_add(conv, conv3_biasses))
-        # Max pooling.The kernel size spec {ksize} also follows the layout.
-        pool = tf.nn.max_pool(relu,
-                              ksize=[1, 2, 2, 1],
-                              strides=[1, 2, 2, 1],
-                              padding='SAME')
-        norm = tf.nn.lrn(pool,
-                         depth_radius=4,
+        norm = tf.nn.lrn(relu,
+                         4,
                          bias=1.0,
                          alpha=0.001 / 9.0,
                          beta=0.75)
@@ -256,13 +251,8 @@ def main(_):
                             padding='SAME')
         # Bias and rectified linear non_linearity.
         relu = tf.nn.relu(tf.nn.bias_add(conv, conv4_biasses))
-        # Max pooling.The kernel size spec {ksize} also follows the layout.
-        pool = tf.nn.max_pool(relu,
-                              ksize=[1, 2, 2, 1],
-                              strides=[1, 2, 2, 1],
-                              padding='SAME')
-        norm = tf.nn.lrn(pool,
-                         depth_radius=4,
+        norm = tf.nn.lrn(relu,
+                         4,
                          bias=1.0,
                          alpha=0.001 / 9.0,
                          beta=0.75)
@@ -279,30 +269,30 @@ def main(_):
                               strides=[1, 2, 2, 1],
                               padding='SAME')
         norm = tf.nn.lrn(pool,
-                         depth_radius=4,
+                         4,
                          bias=1.0,
                          alpha=0.001 / 9.0,
                          beta=0.75)
 
         # Fully 1
         fc1 = tf.reshape(norm, [-1, fc1_weights.get_shape().as_list()[0]])
-        fc1 = tf.add(tf.matmul(fc1, fc1_weights), fc1_biases)
-        fc1 = tf.nn.relu(fc1)
+        fc1 = tf.nn.relu(tf.matmul(fc1, fc1_weights) + fc1_biases)
         # dropout
         fc1 = tf.nn.dropout(fc1, 0.5)
 
         # Fully 2
         fc2 = tf.reshape(fc1, [-1, fc2_weights.get_shape().as_list()[0]])
-        fc2 = tf.add(tf.matmul(fc2, fc2_weights), fc2_biases)
-        fc2 = tf.nn.relu(fc2)
+        fc2 = tf.nn.relu(tf.matmul(fc2, fc2_weights) + fc2_biases)
         # dropout
         fc2 = tf.nn.dropout(fc2, 0.5)
 
-        out = tf.add(tf.matmul(fc2, fc3_weights), fc3_biases)
+        # Fully 3
+        fc3 = tf.reshape(fc2, [-1, fc3_weights.get_shape().as_list()[0]])
+        out = tf.nn.relu(tf.matmul(fc3, fc3_weights) + fc3_biases)
         return out
 
     # Training computation: logits + cross_entropy loss.
-    logits = model(X)
+    logits = model(X, True)
     loss = tf.reduce_mean(
         tf.nn.sparse_softmax_cross_entropy_with_logits(
             logits=logits, labels=y))
@@ -332,11 +322,10 @@ def main(_):
         beta1=0.9).minimize(loss=loss, global_step=batch)
 
     # Predictions for the current training minibatch.
-    train_prediction = tf.nn.softmax_cross_entropy_with_logits_v2(logits)
+    train_prediction = tf.nn.softmax(logits)
 
     # Predictions for the test and validation.
-    eval_prediction = tf.nn.softmax_cross_entropy_with_logits_v2(
-        model(eval_data))
+    eval_prediction = tf.nn.softmax(model(eval_data))
 
     def eval_in_batch(sess, data):
         """Get all predictions for a dataset by running."""
@@ -348,7 +337,7 @@ def main(_):
             end = begin + EVAL_BATCH_SIZE
             if end <= size:
                 predictions[begin:end, :] = sess.run(eval_prediction, feed_dict={
-                    eval_data: data[beigin:end, ...]})
+                    eval_data: data[begin:end, ...]})
             else:
                 batch_predictions = sess.run(eval_prediction,
                                              feed_dict={eval_data: data[-EVAL_BATCH_SIZE:, ...]})
@@ -382,7 +371,7 @@ def main(_):
                         predictions,
                         batch_labels))
                 print('Validation error: %.1f%%' % error_rate(
-                    eval_in_batch(validation_data, sess), validation_labels))
+                    eval_in_batch(sess, validation_data), validation_labels))
                 sys.stdout.flush()
                 # Finally print the result!
             test_error = error_rate(
