@@ -341,7 +341,7 @@ def main(_):
             else:
                 batch_predictions = sess.run(eval_prediction,
                                              feed_dict={eval_data: data[-EVAL_BATCH_SIZE:, ...]})
-                predictions[beigin:, :] = batch_predictions[begin - size:, :]
+                predictions[begin:, :] = batch_predictions[begin - size:, :]
         return predictions
     start_time = time.time()
     with tf.Session() as sess:
