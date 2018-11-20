@@ -375,7 +375,7 @@ def main(_):
                 sys.stdout.flush()
                 # Finally print the result!
             test_error = error_rate(
-                eval_in_batches(
+                eval_in_batch(
                     test_data, sess), test_labels)
             print('Test error: %.1f%%' % test_error)
             if FLAGS.self_test:
