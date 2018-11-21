@@ -7,9 +7,8 @@ import argparse
 import sys
 import time
 
-from .tools import *
-from .download import *
-
+from download import *
+from tools import *
 
 import numpy as np
 import tensorflow as tf
@@ -80,14 +79,14 @@ def main(_):
                                                     stddev=0.1,
                                                     seed=SEED,
                                                     dtype=data_type()))
-    conv1_biasses = tf.Variable(
+    conv1_biases = tf.Variable(
         tf.zeros([64], dtype=data_type()))
 
     conv2_weights = tf.Variable(tf.truncated_normal([5, 5, 64, 192],
                                                     stddev=0.1,
                                                     seed=SEED,
                                                     dtype=data_type()))
-    conv2_biasses = tf.Variable(
+    conv2_biases = tf.Variable(
         tf.constant(
             0.0,
             shape=[192],
@@ -97,54 +96,54 @@ def main(_):
                                                     stddev=0.1,
                                                     seed=SEED,
                                                     dtype=data_type()))
-    conv3_biasses = tf.Variable(
+    conv3_biases = tf.Variable(
         tf.constant(
             0.0,
             shape=[384],
             dtype=data_type()))
 
-    conv4_weights = tf.Variable(tf.truncated_normal([3, 3, 384, 384],
+    conv4_weights = tf.Variable(tf.truncated_normal([3, 3, 384, 256],
                                                     stddev=0.1,
                                                     seed=SEED,
                                                     dtype=data_type()))
-    conv4_biasses = tf.Variable(
+    conv4_biases = tf.Variable(
         tf.constant(
             0.0,
-            shape=[384],
+            shape=[256],
             dtype=data_type()))
 
-    conv5_weights = tf.Variable(tf.truncated_normal([3, 3, 384, 256],
+    conv5_weights = tf.Variable(tf.truncated_normal([3, 3, 256, 256],
                                                     stddev=0.1,
                                                     seed=SEED,
                                                     dtype=data_type()))
-    conv5_biasses = tf.Variable(
+    conv5_biases = tf.Variable(
         tf.constant(
             0.0,
             shape=[256],
             dtype=data_type()))
 
     # fully connected, depth 1024
-    fc1_weights = tf.Variable(tf.truncated_normal([4 * 4 * 256, 4096],
+    fc1_weights = tf.Variable(tf.truncated_normal([4 * 4 * 256, 1024],
                                                   stddev=0.1,
                                                   seed=SEED,
                                                   dtype=data_type()))
     fc1_biases = tf.Variable(
         tf.constant(
             0.0,
-            shape=[4096],
+            shape=[1024],
             dtype=data_type()))
 
-    fc2_weights = tf.Variable(tf.truncated_normal([4096, 4096],
+    fc2_weights = tf.Variable(tf.truncated_normal([1024, 512],
                                                   stddev=0.1,
                                                   seed=SEED,
                                                   dtype=data_type()))
     fc2_biases = tf.Variable(
         tf.constant(
             0.0,
-            shape=[4096],
+            shape=[512],
             dtype=data_type()))
 
-    fc3_weights = tf.Variable(tf.truncated_normal([4096, NUM_LABELS],
+    fc3_weights = tf.Variable(tf.truncated_normal([512, NUM_LABELS],
                                                   stddev=0.1,
                                                   seed=SEED,
                                                   dtype=data_type()))
@@ -156,85 +155,96 @@ def main(_):
 
     def model(data):
         """The model definition"""
-        # AlexNet from google 2015
         # Conv 1
-        conv = tf.nn.conv2d(data,
-                            conv1_weights,
-                            strides=[1, 1, 1, 1],
-                            padding='SAME')
-        # Bias and rectified linear non_linearity.
-        relu = tf.nn.relu(tf.nn.bias_add(conv, conv1_biasses))
+        with tf.name_scope('conv1') as scope:
+            conv1 = tf.nn.conv2d(data,
+                                 conv1_weights,
+                                 strides=[1, 1, 1, 1],
+                                 padding='SAME')
+            # Bias and rectified linear non_linearity.
+            relu = tf.nn.relu(tf.nn.bias_add(conv1, conv1_biases))
+            norm = tf.nn.lrn(relu,
+                             4,
+                             bias=1.0,
+                             alpha=0.001 / 9.0,
+                             beta=0.75)
+            print_activations(conv1)
         # Max pooling.The kernel size spec {ksize} also follows the layout.
-        pool = tf.nn.max_pool(relu,
-                              ksize=[1, 2, 2, 1],
-                              strides=[1, 2, 2, 1],
-                              padding='SAME')
-        norm = tf.nn.lrn(pool,
-                         4,
-                         bias=1.0,
-                         alpha=0.001 / 9.0,
-                         beta=0.75)
+        pool1 = tf.nn.max_pool(norm,
+                               ksize=[1, 2, 2, 1],
+                               strides=[1, 2, 2, 1],
+                               padding='SAME')
+        print_activations(pool1)
+
         # Conv 2
-        conv = tf.nn.conv2d(norm,
-                            conv2_weights,
-                            strides=[1, 1, 1, 1],
-                            padding='SAME')
-        # Bias and rectified linear non_linearity.
-        relu = tf.nn.relu(tf.nn.bias_add(conv, conv2_biasses))
-        norm = tf.nn.local_response_normalization(relu,
-                                                  alpha=1e-4,
-                                                  beta=0.75,
-                                                  depth_radius=2,
-                                                  bias=2.0)
+        with tf.name_scope('conv2') as scope:
+            conv2 = tf.nn.conv2d(pool1,
+                                 conv2_weights,
+                                 strides=[1, 1, 1, 1],
+                                 padding='SAME')
+            # Bias and rectified linear non_linearity.
+            relu = tf.nn.relu(tf.nn.bias_add(conv2, conv2_biases))
+            norm = tf.nn.local_response_normalization(relu,
+                                                      alpha=1e-4,
+                                                      beta=0.75,
+                                                      depth_radius=2,
+                                                      bias=2.0)
+            print_activations(conv2)
         # Max pooling.The kernel size spec {ksize} also follows the layout.
-        pool = tf.nn.max_pool(norm,
-                              ksize=[1, 2, 2, 1],
-                              strides=[1, 2, 2, 1],
-                              padding='SAME')
+        pool2 = tf.nn.max_pool(norm,
+                               ksize=[1, 2, 2, 1],
+                               strides=[1, 2, 2, 1],
+                               padding='SAME')
+        print_activations(pool2)
+
         # Conv 3
-        conv = tf.nn.conv2d(pool,
-                            conv3_weights,
-                            strides=[1, 1, 1, 1],
-                            padding='SAME')
-        # Bias and rectified linear non_linearity.
-        relu = tf.nn.relu(tf.nn.bias_add(conv, conv3_biasses))
-        norm = tf.nn.lrn(relu,
-                         4,
-                         bias=1.0,
-                         alpha=0.001 / 9.0,
-                         beta=0.75)
+        with tf.name_scope('conv3') as scope:
+            conv3 = tf.nn.conv2d(pool2,
+                                 conv3_weights,
+                                 strides=[1, 1, 1, 1],
+                                 padding='SAME')
+            # Bias and rectified linear non_linearity.
+            relu = tf.nn.relu(tf.nn.bias_add(conv3, conv3_biases))
+            norm = tf.nn.lrn(relu,
+                             4,
+                             bias=1.0,
+                             alpha=0.001 / 9.0,
+                             beta=0.75)
+            print_activations(conv3)
+
         # Conv 4
-        conv = tf.nn.conv2d(norm,
-                            conv4_weights,
-                            strides=[1, 1, 1, 1],
-                            padding='SAME')
-        # Bias and rectified linear non_linearity.
-        relu = tf.nn.relu(tf.nn.bias_add(conv, conv4_biasses))
-        norm = tf.nn.lrn(relu,
-                         4,
-                         bias=1.0,
-                         alpha=0.001 / 9.0,
-                         beta=0.75)
+        with tf.name_scope('conv4') as scope:
+            conv4 = tf.nn.conv2d(norm,
+                                 conv4_weights,
+                                 strides=[1, 1, 1, 1],
+                                 padding='SAME')
+            # Bias and rectified linear non_linearity.
+            relu = tf.nn.relu(tf.nn.bias_add(conv4, conv4_biases))
+            norm = tf.nn.lrn(relu,
+                             4,
+                             bias=1.0,
+                             alpha=0.001 / 9.0,
+                             beta=0.75)
+            print_activations(conv4)
+
         # Conv 5
-        conv = tf.nn.conv2d(norm,
-                            conv5_weights,
-                            strides=[1, 1, 1, 1],
-                            padding='SAME')
-        # Bias and rectified linear non_linearity.
-        relu = tf.nn.relu(tf.nn.bias_add(conv, conv5_biasses))
+        with tf.name_scope('conv5') as scope:
+            conv5 = tf.nn.conv2d(norm,
+                                 conv5_weights,
+                                 strides=[1, 1, 1, 1],
+                                 padding='SAME')
+            # Bias and rectified linear non_linearity.
+            relu = tf.nn.relu(tf.nn.bias_add(conv5, conv5_biases))
+            print_activations(conv5)
         # Max pooling.The kernel size spec {ksize} also follows the layout.
-        pool = tf.nn.max_pool(relu,
-                              ksize=[1, 2, 2, 1],
-                              strides=[1, 2, 2, 1],
-                              padding='SAME')
-        norm = tf.nn.lrn(pool,
-                         4,
-                         bias=1.0,
-                         alpha=0.001 / 9.0,
-                         beta=0.75)
+        pool5 = tf.nn.max_pool(relu,
+                               ksize=[1, 2, 2, 1],
+                               strides=[1, 2, 2, 1],
+                               padding='SAME')
+        print_activations(pool5)
 
         # Fully 1
-        fc1 = tf.reshape(norm, [-1, fc1_weights.get_shape().as_list()[0]])
+        fc1 = tf.reshape(pool5, [-1, fc1_weights.get_shape().as_list()[0]])
         fc1 = tf.nn.relu(tf.matmul(fc1, fc1_weights) + fc1_biases)
         # dropout
         fc1 = tf.nn.dropout(fc1, 0.5)
