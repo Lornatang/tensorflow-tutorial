@@ -39,6 +39,12 @@ def data_type():
         return tf.float32
 
 
+def error_rate(predictions, labels):
+    """Return the error rate base on dense predictions"""
+    return 100.00 - (100.00 * np.sum(np.argmax(predictions, 1) == labels) /
+                     predictions.shape[0])
+
+
 def main(_):
     # Get the data.
     train_data_filename = download('train-images-idx3-ubyte.gz')
