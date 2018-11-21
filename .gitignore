@@ -102,7 +102,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
-data/*
+data
 .idea/*
 *.DS_Store
 *.gz
