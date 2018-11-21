@@ -94,7 +94,7 @@ def main(_):
                                                     dtype=data_type()))
     conv2_biases = tf.Variable(
         tf.constant(
-            0.0,
+            0.1,
             shape=[192],
             dtype=data_type()))
 
@@ -104,7 +104,7 @@ def main(_):
                                                     dtype=data_type()))
     conv3_biases = tf.Variable(
         tf.constant(
-            0.0,
+            0.1,
             shape=[384],
             dtype=data_type()))
 
@@ -114,7 +114,7 @@ def main(_):
                                                     dtype=data_type()))
     conv4_biases = tf.Variable(
         tf.constant(
-            0.0,
+            0.1,
             shape=[256],
             dtype=data_type()))
 
@@ -124,38 +124,38 @@ def main(_):
                                                     dtype=data_type()))
     conv5_biases = tf.Variable(
         tf.constant(
-            0.0,
+            0.1,
             shape=[256],
             dtype=data_type()))
 
     # fully connected, depth 1024
-    fc1_weights = tf.Variable(tf.truncated_normal([4 * 4 * 256, 1024],
+    fc1_weights = tf.Variable(tf.truncated_normal([1 * 1 * 256, 4096],
                                                   stddev=0.1,
                                                   seed=SEED,
                                                   dtype=data_type()))
     fc1_biases = tf.Variable(
         tf.constant(
-            0.0,
-            shape=[1024],
+            0.1,
+            shape=[4096],
             dtype=data_type()))
 
-    fc2_weights = tf.Variable(tf.truncated_normal([1024, 512],
+    fc2_weights = tf.Variable(tf.truncated_normal([4096, 4096],
                                                   stddev=0.1,
                                                   seed=SEED,
                                                   dtype=data_type()))
     fc2_biases = tf.Variable(
         tf.constant(
-            0.0,
-            shape=[512],
+            0.1,
+            shape=[4096],
             dtype=data_type()))
 
-    fc3_weights = tf.Variable(tf.truncated_normal([512, NUM_LABELS],
+    fc3_weights = tf.Variable(tf.truncated_normal([4096, NUM_LABELS],
                                                   stddev=0.1,
                                                   seed=SEED,
                                                   dtype=data_type()))
     fc3_biases = tf.Variable(
         tf.constant(
-            0.0,
+            0.1,
             shape=[10],
             dtype=data_type()))
 
