@@ -3,7 +3,6 @@ import os
 import tensorflow as tf
 import cv2
 import numpy as np
-from glob import glob
 
 input_dir = 'data/4'
 
@@ -16,17 +15,16 @@ classes = {'airplanes', 'cars', 'faces', 'motorbikes'}
 # sum of images
 def num_images(path):
     num = 0
-    for lists in os.listdir(path):
-        sub_path = os.path.join(path, lists)
-        if os.path.isfile(sub_path):
-            num += 1
+    for dir in os.listdir(path):
+       for _ in os.listdir(path + '/' + dir):
+           num += 1
     return num
 
 
-num_examples = num_images('data/4')
+num_examples = num_images(input_dir)
 
 
-# 制作TFRecords数据
+# make TFRecords data
 def create_record():
     writer = tf.python_io.TFRecordWriter("caltech_4.tfrecords")
     for index, name in enumerate(classes):
@@ -47,7 +45,6 @@ def create_record():
     writer.close()
 
 
-# =======================================================================================
 def read_and_decode(filename):
     # 创建文件队列,不限读取的数量
     filename_queue = tf.train.string_input_producer([filename])
@@ -73,6 +70,8 @@ def read_and_decode(filename):
 
 
 if __name__ == '__main__':
+    print(f"Images total: {num_examples}.")
+    print(f"Start create record!")
     create_record()
     batch = read_and_decode('caltech_4.tfrecords')
     init_op = tf.group(
@@ -97,7 +96,7 @@ if __name__ == '__main__':
                 str(lab) +
                 '.jpg',
                 img)  # 存下图片;注意cwd后边加上‘/’
-            print(example, lab)
+        print(f"Image written to {output_dir}.")
         coord.request_stop()
         coord.join(threads)
         sess.close()
