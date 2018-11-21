@@ -7,8 +7,9 @@ import argparse
 import sys
 import time
 
-from tools import *
-from download import *
+from .tools import *
+from .download import *
+
 
 import numpy as np
 import tensorflow as tf
