@@ -109,7 +109,7 @@ def main(_):
     num_epochs = NUM_EPOCHS
 
     train_size = train_labels.shape[0]
-    X = tf.placeholder(
+    x = tf.placeholder(
         data_type(),
         shape=[
             BATCH_SIZE,
@@ -195,7 +195,7 @@ def main(_):
             shape=[10],
             dtype=data_type()))
 
-    def model(data, train=True):
+    def model(data):
         """The model definition"""
         # AlexNet from google 2015
         # Conv 1
@@ -292,7 +292,7 @@ def main(_):
         return out
 
     # Training computation: logits + cross_entropy loss.
-    logits = model(X, True)
+    logits = model(x)
     loss = tf.reduce_mean(
         tf.nn.sparse_softmax_cross_entropy_with_logits(
             logits=logits, labels=y))
@@ -327,32 +327,32 @@ def main(_):
     # Predictions for the test and validation.
     eval_prediction = tf.nn.softmax(model(eval_data))
 
-    def eval_in_batch(sess, data):
+    def eval_in_batch(session, data):
         """Get all predictions for a dataset by running."""
         size = data.shape[0]
         if size < EVAL_BATCH_SIZE:
             raise ValueError("Batch size for evals larges than dataset:")
-        predictions = np.ndarray(shape=(size, NUM_LABELS))
+        pred = np.ndarray(shape=(size, NUM_LABELS))
         for begin in range(0, size, EVAL_BATCH_SIZE):
             end = begin + EVAL_BATCH_SIZE
             if end <= size:
-                predictions[begin:end, :] = sess.run(eval_prediction, feed_dict={
+                pred[begin:end, :] = session.run(eval_prediction, feed_dict={
                     eval_data: data[begin:end, ...]})
             else:
-                batch_predictions = sess.run(eval_prediction,
-                                             feed_dict={eval_data: data[-EVAL_BATCH_SIZE:, ...]})
-                predictions[begin:, :] = batch_predictions[begin - size:, :]
-        return predictions
+                batch_predictions = session.run(eval_prediction,
+                                                feed_dict={eval_data: data[-EVAL_BATCH_SIZE:, ...]})
+                pred[begin:, :] = batch_predictions[begin - size:, :]
+        return pred
     start_time = time.time()
     with tf.Session() as sess:
         # Run all the initializers
         tf.global_variables_initializer().run()
-        print("Init all variables")
+        print("Init all variables complete!")
         for step in range(int(num_epochs * train_size) // BATCH_SIZE):
             offset = (step * BATCH_SIZE) % (train_size - BATCH_SIZE)
             batch_data = train_data[offset:(offset + BATCH_SIZE), ...]
             batch_labels = train_labels[offset:(offset + BATCH_SIZE)]
-            feed_dict = {X: batch_data,
+            feed_dict = {x: batch_data,
                          y: batch_labels}
             sess.run(optimizer, feed_dict=feed_dict)
             if step % EVAL_FREQUENCY == 0:
@@ -361,27 +361,22 @@ def main(_):
                                               feed_dict=feed_dict)
                 elapsed_time = time.time() - start_time
                 start_time = time.time()
-                print('Step %d (epoch %.2f), %.1f ms' %
-                      (step, float(step) * BATCH_SIZE / train_size,
-                       1000 * elapsed_time / EVAL_FREQUENCY))
-                print('Minibatch loss: %.3f, learning rate: %.6f' % (l, lr))
+                print(f"Step {step} "
+                      f"(epoch {(float(step) * BATCH_SIZE / train_size):.2f}) "
+                      f"{(1000 * elapsed_time / EVAL_FREQUENCY):.1f} ms")
+                print(f"Minibatch loss: {l:.3f}, learning rate: {lr:.6f}")
                 print(
-                    'Minibatch error: %.1f%%' %
-                    error_rate(
-                        predictions,
-                        batch_labels))
-                print('Validation error: %.1f%%' % error_rate(
-                    eval_in_batch(sess, validation_data), validation_labels))
+                    f"Minibatch error: {error_rate(predictions,batch_labels):.1f}%")
+
+                print(
+                    f"Validation error: {error_rate(eval_in_batch(sess, validation_data), validation_labels):.1f}%")
                 sys.stdout.flush()
                 # Finally print the result!
-            test_error = error_rate(
-                eval_in_batch(
-                    sess, test_data), test_labels)
-            print('Test error: %.1f%%' % test_error)
-            if FLAGS.self_test:
-                print('test_error', test_error)
-                assert test_error == 0.0, 'expected 0.0 test_error, got %.2f' % (
-                    test_error,)
+        test_error = error_rate(eval_in_batch(sess, test_data), test_labels)
+        print(f"Test error: {test_error:.1f}%.")
+        if FLAGS.self_test:
+            print('test_error', test_error)
+            assert test_error == 0.0, f"expected 0.0 test_error, got {test_error:.2f}"
 
 
 if __name__ == '__main__':
