@@ -2,34 +2,46 @@
 import os
 import tensorflow as tf
 import cv2
-import numpy
+import numpy as np
+from glob import glob
 
-input_dir = 'data/04'
+input_dir = 'data/4'
 
 output_dir = 'data'
 
-# 需要的识别类型
+# The type of recognition required
 classes = {'airplanes', 'cars', 'faces', 'motorbikes'}
 
-# 样本总数
-num_samples = 120
+
+# sum of images
+def num_images(path):
+    num = 0
+    for lists in os.listdir(path):
+        sub_path = os.path.join(path, lists)
+        if os.path.isfile(sub_path):
+            num += 1
+    return num
+
+
+num_examples = num_images('data/4')
 
 
 # 制作TFRecords数据
 def create_record():
-    writer = tf.python_io.TFRecordWriter("dog_train.tfrecords")
+    writer = tf.python_io.TFRecordWriter("caltech_4.tfrecords")
     for index, name in enumerate(classes):
         class_path = input_dir + "/" + name + "/"
         for img_name in os.listdir(class_path):
             img_path = class_path + img_name
-            img = cv2.open(img_path)
-            img = img.resize((64, 64))  # 设置需要转换的图片大小
-            img_raw = img.tobytes()  # 将图片转化为原生bytes
-            print(index, img_raw)
+            img = cv2.imread(img_path)
+            img = cv2.resize(
+                img, (64, 64), interpolation=cv2.INTER_NEAREST)  # 设置需要转换的图片大小
+            img = img.tobytes()
+
             example = tf.train.Example(
                 features=tf.train.Features(feature={
                     "label": tf.train.Feature(int64_list=tf.train.Int64List(value=[index])),
-                    'img_raw': tf.train.Feature(bytes_list=tf.train.BytesList(value=[img_raw]))
+                    'img_raw': tf.train.Feature(bytes_list=tf.train.BytesList(value=[img]))
                 }))
             writer.write(example.SerializeToString())
     writer.close()
@@ -60,10 +72,9 @@ def read_and_decode(filename):
     return img, label
 
 
-# =======================================================================================
 if __name__ == '__main__':
     create_record()
-    batch = read_and_decode('dog_train.tfrecords')
+    batch = read_and_decode('caltech_4.tfrecords')
     init_op = tf.group(
         tf.global_variables_initializer(),
         tf.local_variables_initializer())
@@ -73,19 +84,20 @@ if __name__ == '__main__':
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord)
 
-        for i in range(num_samples):
+        for i in range(num_examples):
             example, lab = sess.run(batch)  # 在会话中取出image和label
-            img = cv2.fromarray(example, 'RGB')  # 这里Image是之前提到的
-            img.save(
+            img = cv2.cvtColor(
+                np.asarray(example),
+                cv2.COLOR_RGB2BGR)  # 这里Image是之前提到的
+            cv2.imwrite(
                 output_dir +
                 '/' +
                 str(i) +
                 'samples' +
                 str(lab) +
-                '.jpg')  # 存下图片;注意cwd后边加上‘/’
+                '.jpg',
+                img)  # 存下图片;注意cwd后边加上‘/’
             print(example, lab)
         coord.request_stop()
         coord.join(threads)
         sess.close()
-
-        # ========================================================================================
