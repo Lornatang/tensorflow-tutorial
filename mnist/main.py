@@ -181,18 +181,18 @@ def main(_):
                             padding='SAME')
         # Bias and rectified linear non_linearity.
         relu = tf.nn.relu(tf.nn.bias_add(conv, conv2_biasses))
+        norm = tf.nn.local_response_normalization(relu,
+                                                  alpha=1e-4,
+                                                  beta=0.75,
+                                                  depth_radius=2,
+                                                  bias=2.0)
         # Max pooling.The kernel size spec {ksize} also follows the layout.
-        pool = tf.nn.max_pool(relu,
+        pool = tf.nn.max_pool(norm,
                               ksize=[1, 2, 2, 1],
                               strides=[1, 2, 2, 1],
                               padding='SAME')
-        norm = tf.nn.lrn(pool,
-                         4,
-                         bias=1.0,
-                         alpha=0.001 / 9.0,
-                         beta=0.75)
         # Conv 3
-        conv = tf.nn.conv2d(norm,
+        conv = tf.nn.conv2d(pool,
                             conv3_weights,
                             strides=[1, 1, 1, 1],
                             padding='SAME')
