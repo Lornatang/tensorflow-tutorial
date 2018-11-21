@@ -38,11 +38,5 @@ def extract_labels(filename, num_images):
     return labels
 
 
-def error_rate(predictions, labels):
-    """Return the error rate base on dense predictions"""
-    return 100.00 - (100.00 * np.sum(np.argmax(predictions, 1) == labels) /
-                     predictions.shape[0])
-
-
 def print_activations(t):
     print(t.op.name, ' ', t.get_shape().as_list())
