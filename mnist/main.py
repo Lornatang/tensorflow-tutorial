@@ -165,19 +165,19 @@ def main(_):
         with tf.name_scope('conv1'):
             conv1 = tf.nn.conv2d(data,
                                  conv1_weights,
-                                 strides=[1, 1, 1, 1],
+                                 strides=[1, 4, 4, 1],
                                  padding='SAME')
             # Bias and rectified linear non_linearity.
             relu = tf.nn.relu(tf.nn.bias_add(conv1, conv1_biases))
-            norm = tf.nn.lrn(relu,
-                             4,
-                             bias=1.0,
-                             alpha=0.001 / 9.0,
-                             beta=0.75)
+            norm = tf.nn.local_response_normalization(relu,
+                                                      depth_radius=2,
+                                                      bias=2.0,
+                                                      alpha=1e-4,
+                                                      beta=0.75)
             print_activations(conv1)
         # Max pooling.The kernel size spec {ksize} also follows the layout.
         pool1 = tf.nn.max_pool(norm,
-                               ksize=[1, 2, 2, 1],
+                               ksize=[1, 3, 3, 1],
                                strides=[1, 2, 2, 1],
                                padding='SAME')
         print_activations(pool1)
@@ -211,16 +211,11 @@ def main(_):
                                  padding='SAME')
             # Bias and rectified linear non_linearity.
             relu = tf.nn.relu(tf.nn.bias_add(conv3, conv3_biases))
-            norm = tf.nn.lrn(relu,
-                             4,
-                             bias=1.0,
-                             alpha=0.001 / 9.0,
-                             beta=0.75)
             print_activations(conv3)
 
         # Conv 4
         with tf.name_scope('conv4'):
-            conv4 = tf.nn.conv2d(norm,
+            conv4 = tf.nn.conv2d(relu,
                                  conv4_weights,
                                  strides=[1, 1, 1, 1],
                                  padding='SAME')
@@ -244,7 +239,7 @@ def main(_):
             print_activations(conv5)
         # Max pooling.The kernel size spec {ksize} also follows the layout.
         pool5 = tf.nn.max_pool(relu,
-                               ksize=[1, 2, 2, 1],
+                               ksize=[1, 3, 3, 1],
                                strides=[1, 2, 2, 1],
                                padding='SAME')
         print_activations(pool5)
