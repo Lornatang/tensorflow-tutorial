@@ -162,7 +162,7 @@ def main(_):
     def model(data):
         """The model definition"""
         # Conv 1
-        with tf.name_scope('conv1') as scope:
+        with tf.name_scope('conv1'):
             conv1 = tf.nn.conv2d(data,
                                  conv1_weights,
                                  strides=[1, 1, 1, 1],
@@ -183,7 +183,7 @@ def main(_):
         print_activations(pool1)
 
         # Conv 2
-        with tf.name_scope('conv2') as scope:
+        with tf.name_scope('conv2'):
             conv2 = tf.nn.conv2d(pool1,
                                  conv2_weights,
                                  strides=[1, 1, 1, 1],
@@ -204,7 +204,7 @@ def main(_):
         print_activations(pool2)
 
         # Conv 3
-        with tf.name_scope('conv3') as scope:
+        with tf.name_scope('conv3'):
             conv3 = tf.nn.conv2d(pool2,
                                  conv3_weights,
                                  strides=[1, 1, 1, 1],
@@ -219,7 +219,7 @@ def main(_):
             print_activations(conv3)
 
         # Conv 4
-        with tf.name_scope('conv4') as scope:
+        with tf.name_scope('conv4'):
             conv4 = tf.nn.conv2d(norm,
                                  conv4_weights,
                                  strides=[1, 1, 1, 1],
@@ -234,7 +234,7 @@ def main(_):
             print_activations(conv4)
 
         # Conv 5
-        with tf.name_scope('conv5') as scope:
+        with tf.name_scope('conv5'):
             conv5 = tf.nn.conv2d(norm,
                                  conv5_weights,
                                  strides=[1, 1, 1, 1],
