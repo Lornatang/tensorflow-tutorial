@@ -382,7 +382,7 @@ def main(_):
         test_error = error_rate(eval_in_batch(sess, test_data), test_labels)
         print(f"Test error: {test_error:.1f}%.")
         if FLAGS.self_test:
-            print('test_error', test_error)
+            print(f"test_error {test_error}")
             assert test_error == 0.0, f"expected 0.0 test_error, got {test_error:.2f}"
 
 
