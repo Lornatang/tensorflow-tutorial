@@ -89,7 +89,7 @@ def main(_):
                                                     dtype=data_type()))
     conv2_biasses = tf.Variable(
         tf.constant(
-            0.1,
+            0.0,
             shape=[192],
             dtype=data_type()))
 
@@ -99,7 +99,7 @@ def main(_):
                                                     dtype=data_type()))
     conv3_biasses = tf.Variable(
         tf.constant(
-            0.1,
+            0.0,
             shape=[384],
             dtype=data_type()))
 
@@ -109,7 +109,7 @@ def main(_):
                                                     dtype=data_type()))
     conv4_biasses = tf.Variable(
         tf.constant(
-            0.1,
+            0.0,
             shape=[384],
             dtype=data_type()))
 
@@ -119,7 +119,7 @@ def main(_):
                                                     dtype=data_type()))
     conv5_biasses = tf.Variable(
         tf.constant(
-            0.1,
+            0.0,
             shape=[256],
             dtype=data_type()))
 
@@ -130,7 +130,7 @@ def main(_):
                                                   dtype=data_type()))
     fc1_biases = tf.Variable(
         tf.constant(
-            0.1,
+            0.0,
             shape=[4096],
             dtype=data_type()))
 
@@ -140,7 +140,7 @@ def main(_):
                                                   dtype=data_type()))
     fc2_biases = tf.Variable(
         tf.constant(
-            0.1,
+            0.0,
             shape=[4096],
             dtype=data_type()))
 
@@ -150,7 +150,7 @@ def main(_):
                                                   dtype=data_type()))
     fc3_biases = tf.Variable(
         tf.constant(
-            0.1,
+            0.0,
             shape=[10],
             dtype=data_type()))
 
