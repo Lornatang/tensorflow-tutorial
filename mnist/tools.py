@@ -39,4 +39,4 @@ def extract_labels(filename, num_images):
 
 
 def print_activations(t):
-    print(t.op.name, ' ', t.get_shape().as_list())
+    print(t.op.name, f" {t.get_shape().as_list()}")
