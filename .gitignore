@@ -121,6 +121,5 @@ mnist/checkpoint_dir/checkpoint
 *.index
 *.meta
 
-
-
-
+# for tf data
+*.tfrecords
