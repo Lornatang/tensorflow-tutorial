@@ -12,7 +12,6 @@ import math
 import numpy as np
 import tensorflow as tf
 
-# -----------------生成图片路径和标签的List------------------------------------
 
 input_dir = 'train_data'
 
@@ -29,9 +28,22 @@ motorbike = []
 motorbike_label = []
 
 
-# step1：获取'E:/Re_train/image_data/training_image'下所有的图片路径名，存放到
-# 对应的列表中，同时贴上标签，存放到label列表中。
 def get_files(file_dir, ratio):
+    """Get all the image path names in the directory,
+    store them in the corresponding list,
+    label them and store them in the label list.
+    
+    Args:
+        file_dir: train data dir.
+        ratio:
+
+    Returns:
+        train_data:
+        train_label:
+        val_data:
+        val_label:
+
+    """
     for file in os.listdir(file_dir + '/airplane'):
         airplane.append(file_dir + '/airplane' + '/' + file)
         airplane_label.append(0)
@@ -45,7 +57,8 @@ def get_files(file_dir, ratio):
         motorbike.append(file_dir + '/motorbike' + '/' + file)
         motorbike_label.append(3)
 
-    # step2：对生成的图片路径和标签List做打乱处理把cat和dog合起来组成一个list（img和lab）
+    # Disarrange the generated image path and label List,
+    # and combine (airplane, car, face, motorbike) into a List (img and lab).
     image_list = np.hstack((airplane, car, face, motorbike))
     label_list = np.hstack(
         (airplane_label,
@@ -53,47 +66,51 @@ def get_files(file_dir, ratio):
          face_label,
          motorbike_label))
 
-    # 利用shuffle打乱顺序
+    # Shuffle the order
     temp = np.array([image_list, label_list])
     temp = temp.transpose()
     np.random.shuffle(temp)
 
-    # 从打乱的temp中再取出list（img和lab）
-    # image_list = list(temp[:, 0])
-    # label_list = list(temp[:, 1])
-    # label_list = [int(i) for i in label_list]
-    # return image_list, label_list
-
-    # 将所有的img和lab转换成list
+    # Convert all img and lab to list
     all_image_list = list(temp[:, 0])
     all_label_list = list(temp[:, 1])
 
-    # 将所得List分为两部分，一部分用来训练tra，一部分用来测试val
-    # ratio是测试集的比例
-    n_sample = len(all_label_list)
-    n_val = int(math.ceil(n_sample * ratio))  # 测试样本数
-    n_train = n_sample - n_val  # 训练样本数
+    # Use ratio to control the test ratio
+    sample_num = len(all_label_list)  # all sample num
+    val_num = int(math.ceil(sample_num * ratio))  # val num
+    train_num = sample_num - val_num  # train num
 
-    tra_images = all_image_list[0:n_train]
-    tra_labels = all_label_list[0:n_train]
-    tra_labels = [int(float(i)) for i in tra_labels]
-    val_images = all_image_list[n_train:-1]
-    val_labels = all_label_list[n_train:-1]
-    val_labels = [int(float(i)) for i in val_labels]
+    train_data = all_image_list[0:train_num]
+    train_label = all_label_list[0:train_num]
+    train_label = [int(float(i)) for i in train_label]
+    
+    val_data = all_image_list[train_num:-1]
+    val_label = all_label_list[train_num:-1]
+    val_label = [int(float(i)) for i in val_label]
 
-    return tra_images, tra_labels, val_images, val_labels
+    return train_data, train_label, val_data, val_label
 
-
-# ---------------------------------------------------------------------------
-# --------------------生成Batch----------------------------------------------
 
 # step1：将上面生成的List传入get_batch() ，转换类型，产生一个输入队列queue，因为img和lab
 # 是分开的，所以使用tf.train.slice_input_producer()，然后用tf.read_file()从队列中读取图像
 #   image_W, image_H, ：设置好固定的图像高度和宽度
 #   设置batch_size：每个batch要放多少张图片
 #   capacity：一个队列最大多少
-def get_batch(image, label, image_W, image_H, batch_size, capacity):
-    # 转换类型
+def train_of_batch(image, label, image_W, image_H, batch_size, capacity):
+    """
+    
+    Args:
+        image:
+        label:
+        image_W:
+        image_H:
+        batch_size:
+        capacity:
+
+    Returns:
+
+    """
+    # Convert type
     image = tf.cast(image, tf.string)
     label = tf.cast(label, tf.int32)
 
