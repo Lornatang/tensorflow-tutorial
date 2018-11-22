@@ -9,8 +9,8 @@ N_CLASSES = 4
 IMG_W = 64  # img size
 IMG_H = 64
 BATCH_SIZE = 20
-CAPACITY = 200
-MAX_STEP = 50
+CAPACITY = 100
+MAX_STEP = 100000
 learning_rate = 0.0001
 
 train_dir = 'train_data'
@@ -60,12 +60,12 @@ try:
 
         # print and write to log.
         if step % 10 == 0:
-            print(f"Step {step} loss {loss:.2f} accuracy {accuracy * 100.0:.2f}%")
+            print(f"Step {step} loss {loss:.6f} accuracy {accuracy * 100.0:.4f}%")
             summary_str = sess.run(summary_op)
             train_writer.add_summary(summary_str, step)
-            # Save model
-            checkpoint_path = os.path.join(logs_train_dir, 'model.ckpt')
-            saver.save(sess, checkpoint_path, global_step=step)
+    # Save model
+    checkpoint_path = os.path.join(logs_train_dir, 'model.ckpt')
+    saver.save(sess, checkpoint_path, global_step=step)
     print("Save!")
 
 except tf.errors.OutOfRangeError:
