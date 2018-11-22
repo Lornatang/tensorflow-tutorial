@@ -16,39 +16,42 @@ import tensorflow as tf
 
 input_dir = 'train_data'
 
-airplanes = []
-label_airplanes = []
-cars = []
-label_cars = []
-faces = []
-label_faces = []
-motorbikes = []
-label_motorbikes = []
+airplane = []
+airplane_label = []
+
+car = []
+car_label = []
+
+face = []
+face_label = []
+
+motorbike = []
+motorbike_label = []
 
 
 # step1：获取'E:/Re_train/image_data/training_image'下所有的图片路径名，存放到
 # 对应的列表中，同时贴上标签，存放到label列表中。
 def get_files(file_dir, ratio):
-    for file in os.listdir(file_dir + '/airplanes'):
-        airplanes.append(file_dir + '/airplanes' + '/' + file)
-        label_airplanes.append(0)
-    for file in os.listdir(file_dir + '/cars'):
-        cars.append(file_dir + '/cars' + '/' + file)
-        label_cars.append(1)
-    for file in os.listdir(file_dir + '/faces'):
-        faces.append(file_dir + '/faces' + '/' + file)
-        label_faces.append(2)
-    for file in os.listdir(file_dir + '/motorbikes'):
-        motorbikes.append(file_dir + '/motorbikes' + '/' + file)
-        label_motorbikes.append(3)
+    for file in os.listdir(file_dir + '/airplane'):
+        airplane.append(file_dir + '/airplane' + '/' + file)
+        airplane_label.append(0)
+    for file in os.listdir(file_dir + '/car'):
+        car.append(file_dir + '/car' + '/' + file)
+        car_label.append(1)
+    for file in os.listdir(file_dir + '/face'):
+        face.append(file_dir + '/face' + '/' + file)
+        face_label.append(2)
+    for file in os.listdir(file_dir + '/motorbike'):
+        motorbike.append(file_dir + '/motorbike' + '/' + file)
+        motorbike_label.append(3)
 
     # step2：对生成的图片路径和标签List做打乱处理把cat和dog合起来组成一个list（img和lab）
-    image_list = np.hstack((airplanes, cars, faces, motorbikes))
+    image_list = np.hstack((airplane, car, face, motorbike))
     label_list = np.hstack(
-        (label_airplanes,
-         label_cars,
-         label_faces,
-         label_motorbikes))
+        (airplane_label,
+         car_label,
+         face_label,
+         motorbike_label))
 
     # 利用shuffle打乱顺序
     temp = np.array([image_list, label_list])
