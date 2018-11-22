@@ -15,7 +15,15 @@ classes = {'airplane', 'car', 'face', 'motorbike'}
 
 
 def num_images(path):
-    """sum of images"""
+    """sum of images.
+    
+    Args:
+        path: input dir
+
+    Returns:
+        image num
+
+    """
     num = 0
     for dir in os.listdir(path):
        for _ in os.listdir(path + '/' + dir):
@@ -48,11 +56,19 @@ def create_record():
 
 
 def read_and_decode(filename):
-    """Read the image into the tensorFlow queue"""
+    """Read the image into the tensorFlow queue.
+    
+    Args:
+        filename: read image to tf queue path.
+
+    Returns:
+        data: image data.
+        label:image label.
+
+    """
     filename_queue = tf.train.string_input_producer([filename])
     # create a reader from file queue
     reader = tf.TFRecordReader()
-    # reader从文件队列中读入一个序列化的样本
     _, serialized_example = reader.read(filename_queue)
     # get feature from serialized example
     # Analyze symbolic samples
