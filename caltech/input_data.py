@@ -32,16 +32,13 @@ def get_files(file_dir, ratio):
     """Get all the image path names in the directory,
     store them in the corresponding list,
     label them and store them in the label list.
-    
+
     Args:
         file_dir: train data dir.
-        ratio:
+        ratio:    ratio to control the test ratio.
 
     Returns:
-        train_data:
-        train_label:
-        val_data:
-        val_label:
+        train_data, train_label, val_data, val_label:
 
     """
     for file in os.listdir(file_dir + '/airplane'):
@@ -83,7 +80,7 @@ def get_files(file_dir, ratio):
     train_data = all_image_list[0:train_num]
     train_label = all_label_list[0:train_num]
     train_label = [int(float(i)) for i in train_label]
-    
+
     val_data = all_image_list[train_num:-1]
     val_label = all_label_list[train_num:-1]
     val_label = [int(float(i)) for i in val_label]
@@ -91,28 +88,25 @@ def get_files(file_dir, ratio):
     return train_data, train_label, val_data, val_label
 
 
-# step1：将上面生成的List传入get_batch() ，转换类型，产生一个输入队列queue，因为img和lab
-# 是分开的，所以使用tf.train.slice_input_producer()，然后用tf.read_file()从队列中读取图像
-#   image_W, image_H, ：设置好固定的图像高度和宽度
-#   设置batch_size：每个batch要放多少张图片
-#   capacity：一个队列最大多少
 def train_of_batch(image, label, image_W, image_H, batch_size, capacity):
-    """
-    
+    """Set the batch size for the exercise.
+
     Args:
-        image:
-        label:
-        image_W:
-        image_H:
-        batch_size:
-        capacity:
+        image:      data
+        label:      label
+        image_W:    image width
+        image_H:    image height
+        batch_size: 64
+        capacity:   max of queue
 
     Returns:
+        image_batch:
+        label_batch
 
     """
     # Convert type
     image = tf.cast(image, tf.string)
-    label = tf.cast(label, tf.int32)
+    label = tf.cast(label, tf.int64)
 
     # make an input queue
     input_queue = tf.train.slice_input_producer([image, label])
@@ -120,23 +114,21 @@ def train_of_batch(image, label, image_W, image_H, batch_size, capacity):
     label = input_queue[1]
     image_contents = tf.read_file(input_queue[0])  # read img from a queue
 
-    # step2：将图像解码，不同类型的图像不能混在一起，要么只用jpeg，要么只用png等。
-    image = tf.image.decode_jpeg(image_contents, channels=3)
+    # Decoding the image,
+    img = tf.image.decode_png(image_contents, channels=3)
 
-    # step3：数据预处理，对图像进行旋转、缩放、裁剪、归一化等操作，让计算出的模型更健壮。
-    image = tf.image.resize_image_with_crop_or_pad(image, image_W, image_H)
-    image = tf.image.per_image_standardization(image)
+    # Data preprocessing, image rotation, scaling, cutting, normalization and other operations
+    # are carried out to make the calculated model more robust.
+    img = tf.image.resize_image_with_crop_or_pad(img, image_W, image_H)
+    data = tf.image.per_image_standardization(img)
 
-    # step4：生成batch
+    # generator batch
     # image_batch: 4D tensor [batch_size, width, height, 3],dtype=tf.float32
-    # label_batch: 1D tensor [batch_size], dtype=tf.int32
-    image_batch, label_batch = tf.train.batch([image, label],
+    # label_batch: 1D tensor [batch_size], dtype=tf.int64
+    image_batch, label_batch = tf.train.batch([data, label],
                                               batch_size=batch_size,
                                               num_threads=32,
                                               capacity=capacity)
-    # 重新排列label，行数为[batch_size]
-    label_batch = tf.reshape(label_batch, [batch_size])
+    label_batch = tf.reshape(label_batch, batch_size)
     image_batch = tf.cast(image_batch, tf.float32)
     return image_batch, label_batch
-
-    # ========================================================================
