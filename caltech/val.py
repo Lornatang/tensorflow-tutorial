@@ -1,35 +1,44 @@
-# =============================================================================
-from PIL import Image
 import numpy as np
 import tensorflow as tf
-import matplotlib.pyplot as plt
+import cv2
+
 import model
 import input_data
 
 
-# =======================================================================
-# 获取一张图片
-def get_one_image(train):
-    # 输入参数：train,训练图片的路径
-    # 返回参数：image，从训练图片中随机抽取一张图片
+BATCH_SIZE = 1
+N_CLASSES = 4
+
+
+def get_one_image(filepath):
+    """Read image to train.
+    Args:
+        filepath:  data dir.
+
+    Returns:
+        image:  random read images from data.
+
+    """
     n = len(train)
     ind = np.random.randint(0, n)
-    img_dir = train[ind]  # 随机选择测试的图片
+    # Randomly select the test images
+    file = train[ind]
 
-    img = Image.open(img_dir)
-    plt.imshow(img)
-    imag = img.resize([64, 64])  # 由于图片在预处理阶段以及resize，因此该命令可略
-    image = np.array(imag)
+    data = cv2.imread(file)
+    cv2.imshow('img', data)
+    cv2.waitKey(0)
+    data = cv2.resize(data, (64, 64))
+    image = np.array(data)
     return image
 
 
-# --------------------------------------------------------------------
-# 测试图片
 def evaluate_one_image(image_array):
-    with tf.Graph().as_default():
-        BATCH_SIZE = 1
-        N_CLASSES = 4
+    """
+    Args:
+        image_array: image data for array
 
+    """
+    with tf.Graph().as_default():
         image = tf.cast(image_array, tf.float32)
         image = tf.image.per_image_standardization(image)
         image = tf.reshape(image, [1, 64, 64, 3])
@@ -60,16 +69,15 @@ def evaluate_one_image(image_array):
             prediction = sess.run(logit, feed_dict={x: image_array})
             max_index = np.argmax(prediction)
             if max_index == 0:
-                print('This is a husky with possibility %.6f' %
-                      prediction[:, 0])
+                print(f"This is a airplane with possibility  %.6f" % prediction[:, 0])
             elif max_index == 1:
-                print('This is a jiwawa with possibility %.6f' %
+                print(f'This is a face with possibility %.6f' %
                       prediction[:, 1])
             elif max_index == 2:
-                print('This is a poodle with possibility %.6f' %
+                print(f'This is a car with possibility %.6f' %
                       prediction[:, 2])
             else:
-                print('This is a qiutian with possibility %.6f' %
+                print(f'This is a motorbike with possibility %.6f' %
                       prediction[:, 3])
 
 
