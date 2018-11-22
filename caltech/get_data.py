@@ -12,8 +12,8 @@ output_dir = 'train_data'
 classes = {'airplane', 'car', 'face', 'motorbike'}
 
 
-# sum of images
 def num_images(path):
+    """sum of images"""
     num = 0
     for dir in os.listdir(path):
        for _ in os.listdir(path + '/' + dir):
@@ -24,8 +24,8 @@ def num_images(path):
 num_examples = num_images(input_dir)
 
 
-# make TFRecords data
 def create_record():
+    """make TFRecords data"""
     writer = tf.python_io.TFRecordWriter("caltech_4.tfrecords")
     for index, name in enumerate(classes):
         class_path = input_dir + "/" + name + "/"
@@ -33,7 +33,7 @@ def create_record():
             img_path = class_path + img_name
             img = cv2.imread(img_path)
             img = cv2.resize(
-                img, (64, 64), interpolation=cv2.INTER_NEAREST)  # 设置需要转换的图片大小
+                img, (64, 64), interpolation=cv2.INTER_NEAREST)  # resize img
             data = img.tobytes()
 
             example = tf.train.Example(
@@ -46,14 +46,14 @@ def create_record():
 
 
 def read_and_decode(filename):
-    # 创建文件队列,不限读取的数量
+    """Read the image into the tensorFlow queue"""
     filename_queue = tf.train.string_input_producer([filename])
     # create a reader from file queue
     reader = tf.TFRecordReader()
     # reader从文件队列中读入一个序列化的样本
     _, serialized_example = reader.read(filename_queue)
     # get feature from serialized example
-    # 解析符号化的样本
+    # Analyze symbolic samples
     features = tf.parse_single_example(
         serialized_example,
         features={
@@ -64,7 +64,6 @@ def read_and_decode(filename):
     data = features['data']
     data = tf.decode_raw(data, tf.uint8)
     data = tf.reshape(data, [64, 64, 3])
-    # img = tf.cast(img, tf.float32) * (1. / 255) - 0.5
     label = tf.cast(label, tf.int32)
     return data, label
 
@@ -78,16 +77,19 @@ if __name__ == '__main__':
         tf.global_variables_initializer(),
         tf.local_variables_initializer())
 
-    with tf.Session() as sess:  # 开始一个会话
+    with tf.Session() as sess:
+        # init all variables
         sess.run(init_op)
+        print("Init all variables complete!")
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord)
 
         for i in range(num_examples):
-            example, lab = sess.run(batch)  # 在会话中取出image和label
+            example, lab = sess.run(batch)
+            # Convert the array to an image
             img = cv2.cvtColor(
                 np.asarray(example),
-                cv2.COLOR_RGB2BGR)  # 这里Image是之前提到的
+                cv2.COLOR_RGB2BGR)
             cv2.imwrite(
                 output_dir +
                 '/' +
@@ -95,8 +97,8 @@ if __name__ == '__main__':
                 'samples' +
                 str(lab) +
                 '.jpg',
-                img)  # 存下图片;注意cwd后边加上‘/’
-        print(f"Image written to {output_dir}.")
+                img)
+        print(f"Image written to '{output_dir}'.")
         coord.request_stop()
         coord.join(threads)
         sess.close()
