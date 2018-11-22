@@ -111,3 +111,4 @@ mnist/checkpoint_dir/checkpoint
 *.index
 *.meta
 *.jpg
+*.tfrecords
