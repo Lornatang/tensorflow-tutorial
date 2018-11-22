@@ -1,22 +1,21 @@
-# ======================================================================
-# 导入文件
 import os
 import tensorflow as tf
 import input_data
 import model
 
-# 变量声明
-N_CLASSES = 4  # husky, jiwawa, poodle, qiutian
-IMG_W = 64  # resize图像，太大的话训练时间久
+# parameters
+N_CLASSES = 4
+IMG_W = 64  # img size
 IMG_H = 64
 BATCH_SIZE = 20
-CAPACITY = 200
-MAX_STEP = 40  # 一般大于10K
-learning_rate = 0.0001  # 一般小于0.0001
+CAPACITY = 10
+MAX_STEP = 40
+learning_rate = 0.0001
 
 # 获取批次batch
 train_dir = 'train_data'  # 训练样本的读入路径
 logs_train_dir = 'logs'  # logs存储路径
+
 
 train, train_label, val, val_label = input_data.get_files(train_dir, 0.3)
 # 训练数据及标签
@@ -29,7 +28,7 @@ val_batch, val_label_batch = input_data.train_of_batch(
 # 训练操作定义
 train_logits = model.inference(train_batch, BATCH_SIZE, N_CLASSES)
 train_loss = model.losses(train_logits, train_label_batch)
-train_op = model.trainning(train_loss, learning_rate)
+train_op = model.train(train_loss, learning_rate)
 train_acc = model.evaluation(train_logits, train_label_batch)
 
 # 测试操作定义
