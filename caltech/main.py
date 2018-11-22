@@ -2,14 +2,15 @@ import os
 import tensorflow as tf
 import input_data
 import model
+import numpy as np
 
 # parameters
 N_CLASSES = 4
 IMG_W = 64  # img size
 IMG_H = 64
 BATCH_SIZE = 20
-CAPACITY = 10
-MAX_STEP = 4000
+CAPACITY = 200
+MAX_STEP = 50
 learning_rate = 0.0001
 
 train_dir = 'train_data'
@@ -51,7 +52,7 @@ threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
 # train
 try:
-    for step in range(MAX_STEP):
+    for step in np.arange(MAX_STEP):
         if coord.should_stop():
             break
         # start op node
