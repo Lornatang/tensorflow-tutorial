@@ -4,6 +4,7 @@ import tensorflow as tf
 import input_data
 import model
 import numpy as np
+import sys
 
 # parameters
 N_CLASSES = 4
@@ -62,15 +63,17 @@ def main(_):
         # Save model
         saver = tf.train.Saver()
 
-        with tf.Session() as sess:
-            tf.global_variables_initializer().run()
-            # writen to log
-            train_writer = tf.summary.FileWriter(logs_train_dir, sess.graph)
-    
-            # queue monitor
-            coord = tf.train.Coordinator()
-    
-            # train
+        sess = tf.Session()
+        sess.run(tf.global_variables_initializer())
+        # writen to log
+        train_writer = tf.summary.FileWriter(logs_train_dir, sess.graph)
+
+        # queue monitor
+        coord = tf.train.Coordinator()
+        threads = tf.train.start_queue_runners(sess=sess, coord=coord)
+
+        # train
+        try:
             for step in np.arange(MAX_STEP):
                 if coord.should_stop():
                     break
@@ -88,9 +91,13 @@ def main(_):
                     checkpoint_path = os.path.join(
                         logs_train_dir, 'model.ckpt')
                     saver.save(sess, checkpoint_path, global_step=step)
-                print("Model saved!")
-        
-                coord.request_stop()
+            print("Model saved!")
+
+        except tf.errors.OutOfRangeError:
+            print('Done training -- epoch limit reached')
+
+        finally:
+            coord.request_stop()
 
 
 if __name__ == '__main__':
