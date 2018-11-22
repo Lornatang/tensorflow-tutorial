@@ -123,3 +123,4 @@ mnist/checkpoint_dir/checkpoint
 
 # for tf data
 *.tfrecords
+*.local
