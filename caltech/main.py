@@ -1,25 +1,23 @@
 # ======================================================================
 # 导入文件
 import os
-import numpy as np
 import tensorflow as tf
 import input_data
 import model
 
 # 变量声明
-N_CLASSES = 4  # husky,jiwawa,poodle,qiutian
+N_CLASSES = 4  # husky, jiwawa, poodle, qiutian
 IMG_W = 64  # resize图像，太大的话训练时间久
 IMG_H = 64
 BATCH_SIZE = 20
 CAPACITY = 200
-MAX_STEP = 200  # 一般大于10K
+MAX_STEP = 40  # 一般大于10K
 learning_rate = 0.0001  # 一般小于0.0001
 
 # 获取批次batch
 train_dir = 'train_data'  # 训练样本的读入路径
 logs_train_dir = 'logs'  # logs存储路径
 
-# train, train_label = input_data.get_files(train_dir)
 train, train_label, val, val_label = input_data.get_files(train_dir, 0.3)
 # 训练数据及标签
 train_batch, train_label_batch = input_data.train_of_batch(
@@ -58,7 +56,7 @@ threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 # 进行batch的训练
 try:
     # 执行MAX_STEP步的训练，一步一个batch
-    for step in np.arange(MAX_STEP):
+    for step in range(MAX_STEP):
         if coord.should_stop():
             break
         # 启动以下操作节点，有个疑问，为什么train_logits在这里没有开启？
@@ -75,6 +73,7 @@ try:
         if (step + 1) == MAX_STEP:
             checkpoint_path = os.path.join(logs_train_dir, 'model.ckpt')
             saver.save(sess, checkpoint_path, global_step=step)
+            print("Save!")
 
 except tf.errors.OutOfRangeError:
     print('Done training -- epoch limit reached')
