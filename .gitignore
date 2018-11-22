@@ -102,13 +102,25 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# data file
 data
-.idea/*
-*.DS_Store
 *.gz
+*.jpg
+*.png
+
+# Pycharm
+.idea/*
+
+# for mac
+*.DS_Store
+
+# for checkpoint
 mnist/checkpoint_dir/checkpoint
 *.data-00000-of-00001
 *.index
 *.meta
-*.jpg
-*.tfrecords
+
+
+
+
