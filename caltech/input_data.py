@@ -28,17 +28,21 @@ motorbike = []
 motorbike_label = []
 
 
-def get_files(file_dir, ratio):
+def get_files(file_dir, ratio=0.3, train=False):
     """Get all the image path names in the directory,
     store them in the corresponding list,
     label them and store them in the label list.
 
     Args:
+        train: check is trainning.
         file_dir: train data dir.
         ratio:    ratio to control the test ratio.
 
     Returns:
-        train_data, train_label, val_data, val_label:
+        train:
+            train_data, train_label
+        test:
+            val_data, val_label
 
     """
     for file in os.listdir(file_dir + '/airplane'):
@@ -72,20 +76,25 @@ def get_files(file_dir, ratio):
     all_image_list = list(temp[:, 0])
     all_label_list = list(temp[:, 1])
 
-    # Use ratio to control the test ratio
-    sample_num = len(all_label_list)  # all sample num
-    val_num = int(math.ceil(sample_num * ratio))  # val num
-    train_num = sample_num - val_num  # train num
-
-    train_data = all_image_list[0:train_num]
-    train_label = all_label_list[0:train_num]
-    train_label = [int(float(i)) for i in train_label]
-
-    val_data = all_image_list[train_num:-1]
-    val_label = all_label_list[train_num:-1]
-    val_label = [int(float(i)) for i in val_label]
-
-    return train_data, train_label, val_data, val_label
+    # all sample num
+    sample_num = len(all_label_list)
+    
+    if train:
+        train_data = all_image_list[0:sample_num]
+        train_label = all_label_list[0:sample_num]
+        train_label = [int(float(i)) for i in train_label]
+    
+        return train_data, train_label
+    else:
+        # Use ratio to control the test ratio
+        val_num = int(math.ceil(sample_num * ratio))  # val num
+        train_num = sample_num - val_num  # train num
+    
+        val_data = all_image_list[train_num:-1]
+        val_label = all_label_list[train_num:-1]
+        val_label = [int(float(i)) for i in val_label]
+    
+        return val_data, val_label
 
 
 def train_of_batch(image, label, image_W, image_H, batch_size, capacity):

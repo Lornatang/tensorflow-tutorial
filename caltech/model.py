@@ -79,7 +79,7 @@ def inference(images, batch_size, n_classes):
     # fully 1
     # 128 neurons, to reshape the output of a pool before layer into a line,
     # the activation function relu ()
-    with tf.variable_scope('local3') as scope:
+    with tf.variable_scope('fc1') as scope:
         reshape = tf.reshape(pool2, shape=[batch_size, -1])
         dim = reshape.get_shape()[1].value
         weights = tf.Variable(tf.truncated_normal(shape=[dim, 128],
@@ -92,7 +92,7 @@ def inference(images, batch_size, n_classes):
                                          shape=[128]),
                              name='biases', dtype=tf.float32)
 
-        local3 = tf.nn.relu(
+        fc1 = tf.nn.relu(
             tf.matmul(
                 reshape,
                 weights) + biases,
@@ -101,7 +101,7 @@ def inference(images, batch_size, n_classes):
     # fully 2
     # 128 neurons, to reshape the output of a pool before layer into a line,
     # the activation function relu ()
-    with tf.variable_scope('local4') as scope:
+    with tf.variable_scope('fc2') as scope:
         weights = tf.Variable(tf.truncated_normal(shape=[128, 128],
                                                   stddev=0.005,
                                                   dtype=tf.float32),
@@ -112,11 +112,11 @@ def inference(images, batch_size, n_classes):
                                          shape=[128]),
                              name='biases', dtype=tf.float32)
 
-        local4 = tf.nn.relu(tf.matmul(local3, weights) + biases, name='local4')
+        relu4 = tf.nn.relu(tf.matmul(fc1, weights) + biases, name='fc2')
 
     # dropout 0.8 data
-    with tf.variable_scope('drop1') as scope:
-        drop_out1 = tf.nn.dropout(local4, 0.8, name='drop1')
+    # with tf.variable_scope('drop1') as scope:
+    #     drop_out1 = tf.nn.dropout(fc2, 0.8, name='drop1')
 
     # Softmax layer
     with tf.variable_scope('softmax_linear') as scope:
@@ -134,7 +134,7 @@ def inference(images, batch_size, n_classes):
 
         out = tf.add(
             tf.matmul(
-                drop_out1,
+                relu4,
                 weights),
             biases,
             name='softmax_linear')
@@ -160,7 +160,7 @@ def losses(logits, labels):
     return loss
 
 
-def train(loss, learning_rate):
+def optimization(loss, learning_rate):
     """optimizer loss value.
     
     Args:
