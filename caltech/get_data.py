@@ -6,7 +6,7 @@ import numpy as np
 
 input_dir = 'data/4'
 
-output_dir = 'data'
+output_dir = 'train_data'
 
 # The type of recognition required
 classes = {'airplanes', 'cars', 'faces', 'motorbikes'}
@@ -34,12 +34,12 @@ def create_record():
             img = cv2.imread(img_path)
             img = cv2.resize(
                 img, (64, 64), interpolation=cv2.INTER_NEAREST)  # 设置需要转换的图片大小
-            img = img.tobytes()
+            data = img.tobytes()
 
             example = tf.train.Example(
                 features=tf.train.Features(feature={
                     "label": tf.train.Feature(int64_list=tf.train.Int64List(value=[index])),
-                    'img_raw': tf.train.Feature(bytes_list=tf.train.BytesList(value=[img]))
+                    'data': tf.train.Feature(bytes_list=tf.train.BytesList(value=[data]))
                 }))
             writer.write(example.SerializeToString())
     writer.close()
@@ -58,15 +58,15 @@ def read_and_decode(filename):
         serialized_example,
         features={
             'label': tf.FixedLenFeature([], tf.int64),
-            'img_raw': tf.FixedLenFeature([], tf.string)
+            'data': tf.FixedLenFeature([], tf.string)
         })
     label = features['label']
-    img = features['img_raw']
-    img = tf.decode_raw(img, tf.uint8)
-    img = tf.reshape(img, [64, 64, 3])
+    data = features['data']
+    data = tf.decode_raw(data, tf.uint8)
+    data = tf.reshape(data, [64, 64, 3])
     # img = tf.cast(img, tf.float32) * (1. / 255) - 0.5
     label = tf.cast(label, tf.int32)
-    return img, label
+    return data, label
 
 
 if __name__ == '__main__':
