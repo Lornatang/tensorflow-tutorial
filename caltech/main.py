@@ -9,70 +9,63 @@ IMG_W = 64  # img size
 IMG_H = 64
 BATCH_SIZE = 20
 CAPACITY = 10
-MAX_STEP = 40
+MAX_STEP = 4000
 learning_rate = 0.0001
 
-# 获取批次batch
-train_dir = 'train_data'  # 训练样本的读入路径
-logs_train_dir = 'logs'  # logs存储路径
+train_dir = 'train_data'
+logs_train_dir = 'logs'
 
 
-train, train_label, val, val_label = input_data.get_files(train_dir, 0.3)
-# 训练数据及标签
+train_data, train_label, val_data, val_label = input_data.get_files(train_dir, 0.3)
+# train data and label
 train_batch, train_label_batch = input_data.train_of_batch(
-    train, train_label, IMG_W, IMG_H, BATCH_SIZE, CAPACITY)
-# 测试数据及标签
+    train_data, train_label, IMG_W, IMG_H, BATCH_SIZE, CAPACITY)
+# test data and label
 val_batch, val_label_batch = input_data.train_of_batch(
-    val, val_label, IMG_W, IMG_H, BATCH_SIZE, CAPACITY)
+    val_data, val_label, IMG_W, IMG_H, BATCH_SIZE, CAPACITY)
 
-# 训练操作定义
+# define train op
 train_logits = model.inference(train_batch, BATCH_SIZE, N_CLASSES)
 train_loss = model.losses(train_logits, train_label_batch)
 train_op = model.train(train_loss, learning_rate)
 train_acc = model.evaluation(train_logits, train_label_batch)
 
-# 测试操作定义
+# test train op
 test_logits = model.inference(val_batch, BATCH_SIZE, N_CLASSES)
 test_loss = model.losses(test_logits, val_label_batch)
 test_acc = model.evaluation(test_logits, val_label_batch)
 
-# 这个是log汇总记录
+# start log
 summary_op = tf.summary.merge_all()
 
-# 产生一个会话
 sess = tf.Session()
-# 产生一个writer来写log文件
+# writen to log
 train_writer = tf.summary.FileWriter(logs_train_dir, sess.graph)
-# val_writer = tf.summary.FileWriter(logs_test_dir, sess.graph)
-# 产生一个saver来存储训练好的模型
+# Save model
 saver = tf.train.Saver()
-# 所有节点初始化
+# init all variables
 sess.run(tf.global_variables_initializer())
-# 队列监控
+# queue monitor
 coord = tf.train.Coordinator()
 threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
-# 进行batch的训练
+# train
 try:
-    # 执行MAX_STEP步的训练，一步一个batch
     for step in range(MAX_STEP):
         if coord.should_stop():
             break
-        # 启动以下操作节点，有个疑问，为什么train_logits在这里没有开启？
-        _, tra_loss, tra_acc = sess.run([train_op, train_loss, train_acc])
+        # start op node
+        _, loss, accuracy = sess.run([train_op, train_loss, train_acc])
 
-        # 每隔10步打印一次当前的loss以及acc，同时记录log，写入writer
+        # print and write to log.
         if step % 10 == 0:
-            print(
-                'Step %d, train loss = %.2f, train accuracy = %.2f%%' %
-                (step, tra_loss, tra_acc * 100.0))
+            print(f"Step {step} loss {loss:.2f} accuracy {accuracy * 100.0:.2f}%")
             summary_str = sess.run(summary_op)
             train_writer.add_summary(summary_str, step)
-        # 每隔100步，保存一次训练好的模型
-        if (step + 1) == MAX_STEP:
+            # Save model
             checkpoint_path = os.path.join(logs_train_dir, 'model.ckpt')
             saver.save(sess, checkpoint_path, global_step=step)
-            print("Save!")
+    print("Save!")
 
 except tf.errors.OutOfRangeError:
     print('Done training -- epoch limit reached')
