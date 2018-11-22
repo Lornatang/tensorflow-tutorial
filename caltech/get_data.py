@@ -1,3 +1,5 @@
+# get_data.py
+
 """Convert the original image to the required size and save it"""
 import os
 import tensorflow as tf
