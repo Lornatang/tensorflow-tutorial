@@ -115,7 +115,7 @@ def train_of_batch(image, label, image_W, image_H, batch_size, capacity):
     image_contents = tf.read_file(input_queue[0])  # read img from a queue
 
     # Decoding the image,
-    img = tf.image.decode_png(image_contents, channels=3)
+    img = tf.image.decode_jpeg(image_contents, channels=3)
 
     # Data preprocessing, image rotation, scaling, cutting, normalization and other operations
     # are carried out to make the calculated model more robust.
@@ -129,6 +129,6 @@ def train_of_batch(image, label, image_W, image_H, batch_size, capacity):
                                               batch_size=batch_size,
                                               num_threads=32,
                                               capacity=capacity)
-    label_batch = tf.reshape(label_batch, batch_size)
+    label_batch = tf.reshape(label_batch, [batch_size])
     image_batch = tf.cast(image_batch, tf.float32)
     return image_batch, label_batch
