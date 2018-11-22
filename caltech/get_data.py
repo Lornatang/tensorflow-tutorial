@@ -82,6 +82,7 @@ def read_and_decode(filename):
     data = features['data']
     data = tf.decode_raw(data, tf.uint8)
     data = tf.reshape(data, [64, 64, 3])
+    data = tf.cast(data, tf.float32) * (1. / 255) - 0.5
     label = tf.cast(label, tf.int32)
     return data, label
 
