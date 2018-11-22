@@ -28,7 +28,7 @@ motorbike = []
 motorbike_label = []
 
 
-def get_files(file_dir, ratio=0.3, train=False):
+def get_files(file_dir, ratio=0.3, train=True):
     """Get all the image path names in the directory,
     store them in the corresponding list,
     label them and store them in the label list.
