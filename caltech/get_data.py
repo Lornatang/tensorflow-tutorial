@@ -9,7 +9,7 @@ input_dir = 'data/4'
 output_dir = 'train_data'
 
 # The type of recognition required
-classes = {'airplanes', 'cars', 'faces', 'motorbikes'}
+classes = {'airplane', 'car', 'face', 'motorbike'}
 
 
 # sum of images
