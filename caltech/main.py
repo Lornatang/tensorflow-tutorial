@@ -7,7 +7,7 @@ import numpy as np
 import sys
 
 # parameters
-N_CLASSES = 4
+N_LABELS = 4
 IMG_W = 64  # img size
 IMG_H = 64
 BATCH_SIZE = 64
@@ -36,7 +36,7 @@ def main(_):
         #     CAPACITY)
         #
         # # define val op
-        # val_logits = model.inference(val_batch, BATCH_SIZE, N_CLASSES)
+        # val_logits = model.inference(val_batch, BATCH_SIZE, N_LABELS)
         # val_loss = model.losses(val_logits, val_label_batch)
         # val_acc = model.evaluation(val_logits, val_label_batch)
     else:
@@ -52,7 +52,7 @@ def main(_):
             CAPACITY)
 
         # define train op
-        train_logits = model.inference(train_batch, BATCH_SIZE, N_CLASSES)
+        train_logits = model.inference(train_batch, BATCH_SIZE, N_LABELS)
         train_loss = model.losses(train_logits, train_label_batch)
         train_op = model.optimization(train_loss, learning_rate)
         train_acc = model.evaluation(train_logits, train_label_batch)
@@ -70,7 +70,6 @@ def main(_):
 
         # queue monitor
         coord = tf.train.Coordinator()
-        threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
         # train
         try:

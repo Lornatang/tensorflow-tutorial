@@ -27,7 +27,7 @@ def get_one_image(filepath):
     data = cv2.imread(file)
     cv2.imshow('img', data)
     cv2.waitKey(0)
-    data = cv2.resize(data, (64, 64))
+    data = cv2.resize(data, (224, 224))
     image = np.array(data)
     return image
 
@@ -41,13 +41,13 @@ def evaluate_one_image(image_array):
     with tf.Graph().as_default():
         image = tf.cast(image_array, tf.float32)
         image = tf.image.per_image_standardization(image)
-        image = tf.reshape(image, [1, 64, 64, 3])
+        image = tf.reshape(image, [1, 224, 224, 3])
 
         logit = model.inference(image, BATCH_SIZE, N_CLASSES)
 
         logit = tf.nn.softmax(logit)
 
-        x = tf.placeholder(tf.float32, shape=[64, 64, 3])
+        x = tf.placeholder(tf.float32, shape=[224, 224, 3])
 
         # you need to change the directories to yours.
         logs_train_dir = 'logs'
@@ -86,6 +86,5 @@ def evaluate_one_image(image_array):
 if __name__ == '__main__':
     train_dir = 'train_data'
     train, train_label, val, val_label = input_data.get_files(train_dir, 0.3)
-    img = get_one_image(val)  # 通过改变参数train or val，进而验证训练集或测试集
+    img = get_one_image(val)
     evaluate_one_image(img)
-# ===========================================================================
