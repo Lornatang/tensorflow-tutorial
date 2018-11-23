@@ -1,4 +1,4 @@
-# get_data.py
+# caltech4.py
 
 """Convert the original image to the required size and save it"""
 import os
@@ -6,43 +6,45 @@ import tensorflow as tf
 import cv2
 import numpy as np
 
-input_dir = 'raw_data'
+INPUT_DIR = 'raw_data'
+OUTPUT_DIR = 'data'
 
-output_dir = 'data'
+LOGS_DIR = 'logs'
 
 # check output dir exists
-if not tf.gfile.Exists(output_dir):
-    tf.gfile.MakeDirs(output_dir)
+if not tf.gfile.Exists(OUTPUT_DIR):
+    tf.gfile.MakeDirs(OUTPUT_DIR)
+    
+# check logs dir exists
+if not tf.gfile.Exists(LOGS_DIR):
+    tf.gfile.MakeDirs(LOGS_DIR)
 
 # The type of recognition required
-classes = {'airplane', 'car', 'face', 'motorbike'}
+CLASSES = {'airplane', 'car', 'face', 'motorbike'}
 
 
-def num_images(path):
+def sum_of_dir(dirpath):
     """sum of images.
     
     Args:
-        path: input dir
+        dirpath: input dir
 
     Returns:
         image num
 
     """
     num = 0
-    for dir in os.listdir(path):
-       for _ in os.listdir(path + '/' + dir):
+    for dir in os.listdir(dirpath):
+       for _ in os.listdir(dirpath + '/' + dir):
            num += 1
     return num
-
-
-num_examples = num_images(input_dir)
 
 
 def create_record():
     """make TFRecords raw_data"""
     writer = tf.python_io.TFRecordWriter("caltech_4.tfrecords")
-    for index, name in enumerate(classes):
-        class_path = input_dir + "/" + name + "/"
+    for index, name in enumerate(CLASSES):
+        class_path = INPUT_DIR + "/" + name + "/"
         for img_name in os.listdir(class_path):
             img_path = class_path + img_name
             img = cv2.imread(img_path)
@@ -92,6 +94,7 @@ def read_and_decode(filename):
 
 
 if __name__ == '__main__':
+    num_examples = sum_of_dir(INPUT_DIR)
     print(f"Images total: {num_examples}.")
     print(f"Start create record!")
     create_record()
@@ -114,14 +117,14 @@ if __name__ == '__main__':
                 np.asarray(example),
                 cv2.COLOR_RGB2BGR)
             cv2.imwrite(
-                output_dir +
+                OUTPUT_DIR +
                 '/' +
                 str(i) +
                 'samples' +
                 str(lab) +
                 '.jpg',
                 img)
-        print(f"Image written to '{output_dir}'.")
+        print(f"Image written to '{OUTPUT_DIR}'.")
         coord.request_stop()
         coord.join(threads)
         sess.close()
