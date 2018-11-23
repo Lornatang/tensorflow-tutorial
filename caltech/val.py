@@ -84,7 +84,7 @@ def evaluate_one_image(image_array):
 # ------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    train_dir = 'train_data'
+    train_dir = 'data'
     val, val_label = input_data.get_files(train_dir, train=False)
     img = get_one_image('/Users/mac/Desktop/a.jpg')
     evaluate_one_image(img)

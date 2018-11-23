@@ -15,7 +15,7 @@ CAPACITY = 100
 MAX_STEP = 1000
 learning_rate = 0.0001
 
-train_dir = 'train_data'
+train_dir = 'data'
 logs_train_dir = 'logs'
 
 FLAGS = None

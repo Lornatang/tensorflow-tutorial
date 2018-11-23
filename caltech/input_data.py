@@ -13,7 +13,7 @@ import numpy as np
 import tensorflow as tf
 
 
-input_dir = 'train_data'
+input_dir = 'data'
 
 airplane = []
 airplane_label = []
@@ -40,7 +40,7 @@ def get_files(file_dir, ratio=0.3, train=True):
 
     Returns:
         train:
-            train_data, train_label
+            data, train_label
         test:
             val_data, val_label
 

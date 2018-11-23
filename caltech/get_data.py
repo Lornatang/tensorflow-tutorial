@@ -8,7 +8,7 @@ import numpy as np
 
 input_dir = 'data/4'
 
-output_dir = 'train_data'
+output_dir = 'data'
 
 # The type of recognition required
 classes = {'airplane', 'car', 'face', 'motorbike'}
