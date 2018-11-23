@@ -26,9 +26,8 @@ def num_images(path):
     """
     num = 0
     for dir in os.listdir(path):
-       for file in os.listdir(path + '/' + dir):
+       for _ in os.listdir(path + '/' + dir):
            num += 1
-           print(file)
     return num
 
 
@@ -44,7 +43,7 @@ def create_record():
             img_path = class_path + img_name
             img = cv2.imread(img_path)
             img = cv2.resize(
-                img, (224, 224), interpolation=cv2.INTER_NEAREST)  # resize img
+                img, (64, 64), interpolation=cv2.INTER_NEAREST)  # resize img
             data = img.tobytes()
 
             example = tf.train.Example(
@@ -82,8 +81,8 @@ def read_and_decode(filename):
     label = features['label']
     data = features['data']
     data = tf.decode_raw(data, tf.uint8)
-    data = tf.reshape(data, [224, 224, 3])
-    data = tf.cast(data, tf.float32) * (1. / 255) - 0.5
+    data = tf.reshape(data, [64, 64, 3])
+    # data = tf.cast(data, tf.float32) * (1. / 255) - 0.5
     label = tf.cast(label, tf.int32)
     return data, label
 

@@ -19,15 +19,15 @@ def get_one_image(filepath):
         image:  random read images from data.
 
     """
-    n = len(train)
-    ind = np.random.randint(0, n)
+    # n = len(filepath)
+    # ind = np.random.randint(0, n)
     # Randomly select the test images
-    file = train[ind]
+    # file = filepath[ind]
 
-    data = cv2.imread(file)
+    data = cv2.imread(filepath)
     cv2.imshow('img', data)
     cv2.waitKey(0)
-    data = cv2.resize(data, (224, 224))
+    data = cv2.resize(data, (64, 64))
     image = np.array(data)
     return image
 
@@ -41,13 +41,13 @@ def evaluate_one_image(image_array):
     with tf.Graph().as_default():
         image = tf.cast(image_array, tf.float32)
         image = tf.image.per_image_standardization(image)
-        image = tf.reshape(image, [1, 224, 224, 3])
+        image = tf.reshape(image, [1, 64, 64, 3])
 
         logit = model.inference(image, BATCH_SIZE, N_CLASSES)
 
         logit = tf.nn.softmax(logit)
 
-        x = tf.placeholder(tf.float32, shape=[224, 224, 3])
+        x = tf.placeholder(tf.float32, shape=[64, 64, 3])
 
         # you need to change the directories to yours.
         logs_train_dir = 'logs'
@@ -71,10 +71,10 @@ def evaluate_one_image(image_array):
             if max_index == 0:
                 print(f"This is a airplane with possibility  %.6f" % prediction[:, 0])
             elif max_index == 1:
-                print(f'This is a face with possibility %.6f' %
+                print(f'This is a car with possibility %.6f' %
                       prediction[:, 1])
             elif max_index == 2:
-                print(f'This is a car with possibility %.6f' %
+                print(f'This is a face with possibility %.6f' %
                       prediction[:, 2])
             else:
                 print(f'This is a motorbike with possibility %.6f' %
@@ -85,6 +85,6 @@ def evaluate_one_image(image_array):
 
 if __name__ == '__main__':
     train_dir = 'train_data'
-    train, train_label, val, val_label = input_data.get_files(train_dir, 0.3)
-    img = get_one_image(val)
+    val, val_label = input_data.get_files(train_dir, train=False)
+    img = get_one_image('/Users/mac/Desktop/a.jpg')
     evaluate_one_image(img)

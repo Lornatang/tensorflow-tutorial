@@ -41,7 +41,7 @@ def main(_):
         # val_acc = model.evaluation(val_logits, val_label_batch)
     else:
         # train data and label
-        train_data, train_label = input_data.get_files(train_dir, train=True)
+        train_data, train_label = input_data.get_files(train_dir)
 
         train_batch, train_label_batch = input_data.train_of_batch(
             train_data,
@@ -70,6 +70,7 @@ def main(_):
 
         # queue monitor
         coord = tf.train.Coordinator()
+        threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
         # train
         try:
@@ -82,7 +83,7 @@ def main(_):
                 # print and write to log.
                 if step % 50 == 0:
                     print(
-                        f"Step {step} Loss {loss:.6f} Accuracy {accuracy * 100.0:.4f}%")
+                        f"Step {step} Loss {loss:.6f} Accuracy {accuracy * 100.0:.2f}%")
                     summary_str = sess.run(summary_op)
                     train_writer.add_summary(summary_str, step)
                 if step % CAPACITY == 0:
