@@ -185,7 +185,3 @@ def evaluation(logits, labels):
         accuracy = tf.reduce_mean(correct)
         tf.summary.scalar(scope.name + '/accuracy', accuracy)
     return accuracy
-
-
-def print_activity(t):
-    print(t.op.name, f" {t.get_shape().as_list()}")
