@@ -98,6 +98,8 @@ def main(_):
 
         finally:
             coord.request_stop()
+            coord.join(threads)
+            sess.close()
 
 
 if __name__ == '__main__':
