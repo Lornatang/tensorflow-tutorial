@@ -13,10 +13,10 @@ N_CLASSES = 4
 def get_one_image(filepath):
     """Read image to train.
     Args:
-        filepath:  data dir.
+        filepath:  raw_data dir.
 
     Returns:
-        image:  random read images from data.
+        image:  random read images from raw_data.
 
     """
     # n = len(filepath)
@@ -35,7 +35,7 @@ def get_one_image(filepath):
 def evaluate_one_image(image_array):
     """
     Args:
-        image_array: image data for array
+        image_array: image raw_data for array
 
     """
     with tf.Graph().as_default():
@@ -84,7 +84,7 @@ def evaluate_one_image(image_array):
 # ------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    train_dir = 'data'
+    train_dir = 'raw_data'
     val, val_label = input_data.get_files(train_dir, train=False)
     img = get_one_image('/Users/mac/Desktop/a.jpg')
     evaluate_one_image(img)

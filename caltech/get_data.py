@@ -6,9 +6,13 @@ import tensorflow as tf
 import cv2
 import numpy as np
 
-input_dir = 'data/4'
+input_dir = 'raw_data'
 
 output_dir = 'data'
+
+# check output dir exists
+if not tf.gfile.Exists(output_dir):
+    tf.gfile.MakeDirs(output_dir)
 
 # The type of recognition required
 classes = {'airplane', 'car', 'face', 'motorbike'}
@@ -35,7 +39,7 @@ num_examples = num_images(input_dir)
 
 
 def create_record():
-    """make TFRecords data"""
+    """make TFRecords raw_data"""
     writer = tf.python_io.TFRecordWriter("caltech_4.tfrecords")
     for index, name in enumerate(classes):
         class_path = input_dir + "/" + name + "/"
@@ -49,7 +53,7 @@ def create_record():
             example = tf.train.Example(
                 features=tf.train.Features(feature={
                     "label": tf.train.Feature(int64_list=tf.train.Int64List(value=[index])),
-                    'data': tf.train.Feature(bytes_list=tf.train.BytesList(value=[data]))
+                    'raw_data': tf.train.Feature(bytes_list=tf.train.BytesList(value=[data]))
                 }))
             writer.write(example.SerializeToString())
     writer.close()
@@ -62,7 +66,7 @@ def read_and_decode(filename):
         filename: read image to tf queue path.
 
     Returns:
-        data: image data.
+        raw_data: image raw_data.
         label:image label.
 
     """
@@ -76,13 +80,13 @@ def read_and_decode(filename):
         serialized_example,
         features={
             'label': tf.FixedLenFeature([], tf.int64),
-            'data': tf.FixedLenFeature([], tf.string)
+            'raw_data': tf.FixedLenFeature([], tf.string)
         })
     label = features['label']
-    data = features['data']
+    data = features['raw_data']
     data = tf.decode_raw(data, tf.uint8)
     data = tf.reshape(data, [64, 64, 3])
-    # data = tf.cast(data, tf.float32) * (1. / 255) - 0.5
+    # raw_data = tf.cast(raw_data, tf.float32) * (1. / 255) - 0.5
     label = tf.cast(label, tf.int32)
     return data, label
 

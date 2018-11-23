@@ -15,7 +15,7 @@ CAPACITY = 100
 MAX_STEP = 1000
 learning_rate = 0.0001
 
-train_dir = 'data'
+train_dir = 'raw_data'
 logs_train_dir = 'logs'
 
 FLAGS = None
@@ -24,7 +24,7 @@ FLAGS = None
 def main(_):
     if FLAGS.self_test:
         pass
-        # train data and label
+        # train raw_data and label
         # val_data, val_label = input_data.get_files(train_dir)
         #
         # val_batch, val_label_batch = input_data.train_of_batch(
@@ -40,7 +40,7 @@ def main(_):
         # val_loss = model.losses(val_logits, val_label_batch)
         # val_acc = model.evaluation(val_logits, val_label_batch)
     else:
-        # train data and label
+        # train raw_data and label
         train_data, train_label = input_data.get_files(train_dir)
 
         train_batch, train_label_batch = input_data.train_of_batch(

@@ -3,7 +3,7 @@
 """
     We need to do sample and label classification of generated images of specified size,
     obtain the get_files input by neural network,
-    and meanwhile input data for batch processing
+    and meanwhile input raw_data for batch processing
     in order to facilitate network training.
 """
 
@@ -13,7 +13,7 @@ import numpy as np
 import tensorflow as tf
 
 
-input_dir = 'data'
+input_dir = 'raw_data'
 
 airplane = []
 airplane_label = []
@@ -35,12 +35,12 @@ def get_files(file_dir, ratio=0.3, train=True):
 
     Args:
         train: check is trainning.
-        file_dir: train data dir.
+        file_dir: train raw_data dir.
         ratio:    ratio to control the test ratio.
 
     Returns:
         train:
-            data, train_label
+            raw_data, train_label
         test:
             val_data, val_label
 
@@ -101,7 +101,7 @@ def train_of_batch(image, label, image_W, image_H, batch_size, capacity):
     """Set the batch size for the exercise.
 
     Args:
-        image:      data
+        image:      raw_data
         label:      label
         image_W:    image width
         image_H:    image height

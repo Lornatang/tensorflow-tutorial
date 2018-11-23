@@ -13,7 +13,7 @@ def inference(images, batch_size, n_labels):
     """Use simple LeCun Net to test.
 
     Args:
-        images:     data.
+        images:     raw_data.
         batch_size: single training.
         n_labels:  (car, airplane, motorbike, face) 4.
 

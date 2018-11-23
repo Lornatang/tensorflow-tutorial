@@ -5,11 +5,11 @@ import tensorflow as tf
 
 # Download dataset
 SOURCE_URL = "http://yann.lecun.com/exdb/mnist/"
-WORK_DIRECTORY = './data/mnist'
+WORK_DIRECTORY = './raw_data/mnist'
 
 
 def download(filename):
-    """Download the data from Yann's website, unless it"""
+    """Download the raw_data from Yann's website, unless it"""
     if not tf.gfile.Exists(WORK_DIRECTORY):
         tf.gfile.MakeDirs(WORK_DIRECTORY)
     filepath = os.path.join(WORK_DIRECTORY, filename)

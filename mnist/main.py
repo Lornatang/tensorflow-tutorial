@@ -15,7 +15,7 @@ import tensorflow as tf
 
 # Download dataset
 SOURCE_URL = "http://yann.lecun.com/exdb/mnist/"
-WORK_DIRECTORY = './data/mnist'
+WORK_DIRECTORY = './raw_data/mnist'
 IMAGE_SIZE = 28
 NUM_CHANNELS = 1  # black and white no rgb.
 PIXEL_DEPTH = 255
@@ -46,7 +46,7 @@ def error_rate(predictions, labels):
 
 
 def main(_):
-    # Get the data.
+    # Get the raw_data.
     train_data_filename = download('train-images-idx3-ubyte.gz')
     train_labels_filename = download('train-labels-idx1-ubyte.gz')
     test_data_filename = download('t10k-images-idx3-ubyte.gz')
@@ -326,7 +326,7 @@ def main(_):
                          y: batch_labels}
             sess.run(optimizer, feed_dict=feed_dict)
             if step % EVAL_FREQUENCY == 0:
-                # fetch some extra node's data
+                # fetch some extra node's raw_data
                 l, lr, predictions = sess.run([loss, learning_rate, train_prediction],
                                               feed_dict=feed_dict)
                 elapsed_time = time.time() - start_time
