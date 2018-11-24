@@ -9,6 +9,8 @@ import input_data
 BATCH_SIZE = 1
 N_CLASSES = 4
 
+X = tf.placeholder(tf.float32, shape=[224, 224, 3])
+
 
 def get_one_image(filepath):
     """Read image to train.
@@ -26,28 +28,26 @@ def get_one_image(filepath):
 
     data = cv2.imread(filepath)
     cv2.imshow('img', data)
-    cv2.waitKey(0)
+    # cv2.waitKey(0)
     data = cv2.resize(data, (224, 224))
     image = np.array(data)
     return image
 
 
-def evaluate_one_image(image_array):
+def evaluate_one_image(data):
     """
     Args:
-        image_array: image raw_data for array
+        data: image raw_data for array
 
     """
     with tf.Graph().as_default():
-        image = tf.cast(image_array, tf.float32)
+        image = tf.cast(data, tf.float32)
         image = tf.image.per_image_standardization(image)
         image = tf.reshape(image, [1, 224, 224, 3])
 
         logit = model.inference(image, BATCH_SIZE, N_CLASSES)
 
         logit = tf.nn.softmax(logit)
-
-        x = tf.placeholder(tf.float32, shape=[224, 224, 3])
 
         # you need to change the directories to yours.
         logs_train_dir = 'logs'
@@ -66,14 +66,15 @@ def evaluate_one_image(image_array):
             else:
                 print('No checkpoint file found')
 
-            prediction = sess.run(logit, feed_dict={x: image_array})
-            max_index = np.argmax(prediction)
-            if max_index == 0:
-                print(f"This is a airplane with possibility  %.6f" % prediction[:, 0])
-            elif max_index == 1:
+            prediction = sess.run(logit, feed_dict={X: data})
+            prediction = np.argmax(prediction)
+            if prediction == 0:
+                print(f"This is a airplane with possibility  %.6f" %
+                      prediction[:, 0])
+            elif prediction == 1:
                 print(f'This is a car with possibility %.6f' %
                       prediction[:, 1])
-            elif max_index == 2:
+            elif prediction == 2:
                 print(f'This is a face with possibility %.6f' %
                       prediction[:, 2])
             else:
@@ -81,10 +82,8 @@ def evaluate_one_image(image_array):
                       prediction[:, 3])
 
 
-# ------------------------------------------------------------------------
-
 if __name__ == '__main__':
     train_dir = 'data'
     val, val_label = input_data.get_files(train_dir, train=False)
-    img = get_one_image('/Users/mac/Desktop/a.jpg')
+    img = get_one_image('/Users/mac/Desktop/moto.jpg')
     evaluate_one_image(img)
