@@ -126,7 +126,7 @@ def inference(images):
     print_activations(pool5)
     
     # fully 1
-    with tf.name_score('fc1') as scope:
+    with tf.name_scope('fc1') as scope:
         kernel = tf.Variable(tf.truncated_normal())
 
     return pool5
