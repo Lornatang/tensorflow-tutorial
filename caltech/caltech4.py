@@ -105,7 +105,7 @@ def read_and_decode(filename):
     return data, label
 
 
-if __name__ == '__main__':
+def main(_):
     num_examples = sum_of_file(INPUT_DIR)
     print(f"Images total: {num_examples}.\n")
     print(f"Start create record!\n")
@@ -124,7 +124,6 @@ if __name__ == '__main__':
         print("Init all variables complete!")
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord)
-        classes = None
         for i in range(num_examples):
             example, lab = sess.run(batch)
             # Convert the array to an image
@@ -151,3 +150,7 @@ if __name__ == '__main__':
         coord.request_stop()
         coord.join(threads)
         sess.close()
+
+
+if __name__ == '__main__':
+    tf.app.run(main=main)
