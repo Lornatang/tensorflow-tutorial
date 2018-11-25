@@ -6,6 +6,8 @@ import tensorflow as tf
 import cv2
 import numpy as np
 
+import utils
+
 INPUT_DIR = 'raw_data/'
 OUTPUT_DIR = 'data/'
 
@@ -28,21 +30,7 @@ for _, dir_name in enumerate(CLASSES):
         tf.gfile.MakeDirs(OUTPUT_DIR + dir_name)
 
 
-def sum_of_file(dirpath):
-    """sum of images.
 
-    Args:
-        dirpath: input dir
-
-    Returns:
-        image num
-
-    """
-    num = 0
-    for dir in os.listdir(dirpath):
-        for _ in os.listdir(dirpath + '/' + dir):
-            num += 1
-    return num
 
 
 def create_record():
@@ -106,7 +94,7 @@ def read_and_decode(filename):
 
 
 def main(_):
-    num_examples = sum_of_file(INPUT_DIR)
+    num_examples = utils.sum_of_file(INPUT_DIR)
     print(f"Images total: {num_examples}.\n")
     print(f"Start create record!\n")
     create_record()
