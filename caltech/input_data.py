@@ -27,6 +27,24 @@ motorbike = []
 motorbike_label = []
 
 
+def convert_string_to_float(filename, label):
+    """read filename to float for train.
+    
+    Args:
+        filename: The train file name.
+        label:    The train file label.
+
+    Returns:
+        image:    image data.
+        label:    image label.
+
+    """
+    image_string = tf.read_file(filename)
+    image_decoded = tf.image.decode_jpeg(image_string, channels=3)
+    image = tf.cast(image_decoded, tf.float32)
+    return image, label
+
+
 def get_files(file_dir):
     """Get all the image path names in the directory,
     store them in the corresponding list,
@@ -96,20 +114,25 @@ def next_batch(image, label, batch_size=64):
 
     """
     # Convert type
-    image = tf.cast(image, tf.float32)
+    image = tf.cast(image, tf.string)
     label = tf.cast(label, tf.int64)
+    
+    # image = tf.io.read_file(image)
+    # image = tf.image.decode_jpeg(image)
 
     # make an input queue
     data = tf.data.Dataset.from_tensor_slices((image, label))
     # old func will remove
     # input_queue = tf.train.slice_input_producer([image, label])
-    
-    data_batch = data.batch(batch_size=batch_size)
-    iterator = tf.data.Iterator.from_structure(data_batch.output_types,
-                                               data_batch.output_shapes)
+    data = data.map(convert_string_to_float)
+
+    data_batch = data.batch(batch_size)
+    iterator = data_batch.make_one_shot_iterator()
 
     # generator batch
     # image_batch: 4D tensor [batch_size, width, height, 3],dtype=tf.float32
     # label_batch: 1D tensor [batch_size], dtype=tf.int64
-    image_batch, label_batch = iterator.get_next()
-    return image_batch, label_batch
+    with tf.Session() as sess:
+        # sess.run(tf.initializers.global_variables())
+        train_batch = sess.run(iterator.get_next())
+        return train_batch
