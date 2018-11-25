@@ -8,8 +8,9 @@ import input_data
 
 BATCH_SIZE = 1
 N_CLASSES = 4
+IMG_SIZE = 224
 
-X = tf.placeholder(tf.float32, shape=[224, 224, 3])
+X = tf.placeholder(tf.float32, shape=[IMG_SIZE, IMG_SIZE, 3])
 
 
 def get_one_image(filepath):
@@ -45,7 +46,7 @@ def evaluate_one_image(data):
         image = tf.image.per_image_standardization(image)
         image = tf.reshape(image, [1, 224, 224, 3])
 
-        logit = model.inference(image, BATCH_SIZE, N_CLASSES)
+        logit = model.inference(image, N_CLASSES)
 
         logit = tf.nn.softmax(logit)
 
@@ -84,6 +85,6 @@ def evaluate_one_image(data):
 
 if __name__ == '__main__':
     train_dir = 'data'
-    val, val_label = input_data.get_files(train_dir, train=False)
+    val, val_label = input_data.get_files(train_dir)
     img = get_one_image('/Users/mac/Desktop/moto.jpg')
     evaluate_one_image(img)
