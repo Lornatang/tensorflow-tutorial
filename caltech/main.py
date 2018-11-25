@@ -27,7 +27,7 @@ def main(_):
     )
 
     # define train op
-    train_logits = model.inference(train_batch, BATCH_SIZE, N_LABELS)
+    train_logits = model.inference(train_batch, N_LABELS)
     train_loss = model.losses(train_logits, train_label_batch)
     train_op = model.optimization(train_loss, LEARNING_RATE)
     train_acc = model.evaluation(train_logits, train_label_batch)
@@ -45,7 +45,7 @@ def main(_):
 
     # queue monitor
     coord = tf.train.Coordinator()
-    threads = tf.train.start_queue_runners(sess=sess, coord=coord)
+    # threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
     # train
     try:
@@ -74,7 +74,6 @@ def main(_):
 
     finally:
         coord.request_stop()
-        coord.join(threads)
         sess.close()
 
 
