@@ -252,10 +252,6 @@ def inference(images, classes):
 
         local4 = tf.nn.relu(tf.matmul(local3, weights) + biases, name='local4')
 
-    # dropout层
-    #    with tf.variable_scope('dropout') as scope:
-    #        drop_out = tf.nn.dropout(local4, 0.8)
-
     # Softmax回归层
     # 将前面的FC层输出，做一个线性回归，计算出每一类的得分，在这里是2类，所以这个层输出的是两个得分。
     with tf.variable_scope('softmax_linear') as scope:
