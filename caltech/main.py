@@ -32,15 +32,15 @@ def main(_):
     train_op = model.optimization(train_loss, LEARNING_RATE)
     train_acc = model.evaluation(train_logits, train_label_batch)
 
-    # start log
+    # start logs
     summary_op = tf.summary.merge_all()
 
-    # Save model
+    # Save logs
     saver = tf.train.Saver()
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
-    # writen to log
+    # writen to logs
     train_writer = tf.summary.FileWriter(LOGS_DIRECTORY, sess.graph)
 
     # queue monitor
@@ -55,16 +55,16 @@ def main(_):
             # start op node
             _, loss, accuracy = sess.run([train_op, train_loss, train_acc])
 
-            # print and write to log.
-            if step % 20 == 0:
+            # print and write to logs.
+            if step % 2 == 0:
                 print(
                     f"Step [{step}/{MAX_STEP}] Loss {loss:.6f} Accuracy {accuracy * 100.0:.2f}%")
                 summary_str = sess.run(summary_op)
                 train_writer.add_summary(summary_str, step)
             if accuracy >= 0.999:
-                # Save model
+                # Save logs
                 checkpoint_path = os.path.join(
-                    LOGS_DIRECTORY, 'model.ckpt')
+                    LOGS_DIRECTORY, 'logs.ckpt')
                 saver.save(sess, checkpoint_path, global_step=step)
                 break
         print(f"Model saved! Global step = {step}")

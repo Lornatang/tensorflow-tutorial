@@ -30,9 +30,6 @@ for _, dir_name in enumerate(CLASSES):
         tf.gfile.MakeDirs(OUTPUT_DIR + dir_name)
 
 
-
-
-
 def create_record():
     """make TFRecords raw_data"""
     writer = tf.python_io.TFRecordWriter("caltech_4.tfrecords")

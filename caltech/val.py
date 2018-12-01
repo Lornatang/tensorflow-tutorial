@@ -48,7 +48,7 @@ def evaluate_one_image(data):
 
         logit = model.inference(image, N_CLASSES)
 
-        logit = tf.nn.softmax(logit)
+        # logit = tf.nn.softmax(logit)
 
         # you need to change the directories to yours.
         logs_train_dir = 'logs'
