@@ -125,3 +125,4 @@ mnist/checkpoint_dir/checkpoint
 *.tfrecords
 *.local
 caltech/logs/checkpoint
+cat_dogs/logs/checkpoint
