@@ -39,7 +39,7 @@ def convert_string_to_float(filename, label):
         label:    image label.
 
     """
-    image_string = tf.read_file(filename)
+    image_string = tf.io.read_file(filename)
     image_decoded = tf.image.decode_jpeg(image_string, channels=3)
     image = tf.cast(image_decoded, tf.float32)
     return image, label
