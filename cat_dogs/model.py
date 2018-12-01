@@ -13,6 +13,7 @@ def inference(images, classes, batch_size=32):
     """Build the AlexNet logs.
 
     Args:
+      batch_size: The batch size is 32.
       images: Images Tensor
       classes: Image classes
 
