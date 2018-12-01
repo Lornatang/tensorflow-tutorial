@@ -68,6 +68,7 @@ def read_and_decode(filename):
     """
     filename_queue = tf.train.string_input_producer([filename])
     # create a reader from file queue
+    # reader = tf.data.TFRecordDataset
     reader = tf.TFRecordReader()
     _, serialized_example = reader.read(filename_queue)
     # get feature from serialized example
@@ -92,7 +93,7 @@ def main(_):
     print(f"Start create record!\n")
     create_record()
     print(f"Record create successful.")
-    batch = read_and_decode('caltech_4.tfrecords')
+    batch = read_and_decode('cat_dogs.tfrecords')
     # Distributed tensorflow
     init_op = tf.group(
         tf.initializers.local_variables(),
