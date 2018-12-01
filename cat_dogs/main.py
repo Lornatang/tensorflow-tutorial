@@ -45,7 +45,7 @@ def main(_):
 
     # queue monitor
     coord = tf.train.Coordinator()
-    # threads = tf.train.start_queue_runners(sess=sess, coord=coord)
+    threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
     # train
     try:

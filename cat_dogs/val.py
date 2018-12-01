@@ -6,7 +6,7 @@ import model
 import input_data
 
 
-BATCH_SIZE = 1
+BATCH_SIZE = 32
 N_CLASSES = 2
 IMG_SIZE = 224
 
@@ -41,21 +41,21 @@ def evaluate_one_image(data):
         data: image raw_data for array
 
     """
-    with tf.Graph().as_default():
-        image = tf.cast(data, tf.float32)
-        image = tf.image.per_image_standardization(image)
-        image = tf.reshape(image, [1, 224, 224, 3])
+    image = tf.cast(data, tf.float32)
+    image = tf.image.per_image_standardization(image)
+    image = tf.reshape(image, [1, 224, 224, 3])
 
-        logit = model.inference(image, N_CLASSES)
+    logit = model.inference(image, N_CLASSES)
 
-        # logit = tf.nn.softmax(logit)
+    # logit = tf.nn.softmax(logit)
 
-        # you need to change the directories to yours.
-        logs_train_dir = 'logs'
+    # you need to change the directories to yours.
+    logs_train_dir = 'logs'
 
-        saver = tf.train.Saver()
+    saver = tf.train.Saver()
 
-        with tf.Session() as sess:
+    with tf.Session() as sess:
+            sess.run(tf.initializers.global_variables())
 
             print("Reading checkpoints...")
             ckpt = tf.train.get_checkpoint_state(logs_train_dir)
@@ -80,5 +80,5 @@ def evaluate_one_image(data):
 if __name__ == '__main__':
     train_dir = 'data'
     val, val_label = input_data.get_files(train_dir)
-    img = get_one_image('/Users/mac/Desktop/moto.jpg')
+    img = get_one_image('/Users/mac/Desktop/airplane.jpg')
     evaluate_one_image(img)
