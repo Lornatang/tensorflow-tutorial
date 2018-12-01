@@ -7,7 +7,7 @@ import input_data
 
 
 BATCH_SIZE = 1
-N_CLASSES = 4
+N_CLASSES = 2
 IMG_SIZE = 224
 
 X = tf.placeholder(tf.float32, shape=[IMG_SIZE, IMG_SIZE, 3])
@@ -29,7 +29,7 @@ def get_one_image(filepath):
 
     data = cv2.imread(filepath)
     cv2.imshow('img', data)
-    # cv2.waitKey(0)
+    cv2.waitKey(0)
     data = cv2.resize(data, (224, 224))
     image = np.array(data)
     return image
@@ -70,17 +70,11 @@ def evaluate_one_image(data):
             prediction = sess.run(logit, feed_dict={X: data})
             prediction = np.argmax(prediction)
             if prediction == 0:
-                print(f"This is a airplane with possibility  %.6f" %
+                print(f"This is a cat with possibility  %.6f" %
                       prediction[:, 0])
             elif prediction == 1:
-                print(f'This is a car with possibility %.6f' %
+                print(f'This is a dog with possibility %.6f' %
                       prediction[:, 1])
-            elif prediction == 2:
-                print(f'This is a face with possibility %.6f' %
-                      prediction[:, 2])
-            else:
-                print(f'This is a motorbike with possibility %.6f' %
-                      prediction[:, 3])
 
 
 if __name__ == '__main__':
