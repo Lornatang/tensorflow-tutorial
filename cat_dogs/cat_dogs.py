@@ -14,7 +14,7 @@ OUTPUT_DIR = 'data/'
 LOGS_DIR = 'logs'
 
 # The type of recognition required
-CLASSES = {'airplane', 'car', 'face', 'motorbike'}
+CLASSES = {'cat', 'dog'}
 
 # check output dir exists
 if not tf.gfile.Exists(OUTPUT_DIR):
@@ -32,16 +32,12 @@ for _, dir_name in enumerate(CLASSES):
 
 def create_record():
     """make TFRecords raw_data"""
-    writer = tf.python_io.TFRecordWriter("caltech_4.tfrecords")
+    writer = tf.python_io.TFRecordWriter("cat_dogs.tfrecords")
     for index, name in enumerate(CLASSES):
-        if name == 'airplane':
+        if name == 'cat':
             index = 0
-        elif name == 'car':
-            index = 1
-        elif name == 'face':
-            index = 2
         else:
-            index = 3
+            index = 1
         class_path = INPUT_DIR + "/" + name + "/"
         for img_name in os.listdir(class_path):
             img_path = os.path.join(class_path, img_name)
@@ -116,13 +112,9 @@ def main(_):
                 np.asarray(example),
                 cv2.COLOR_RGB2BGR)
             if lab == 0:
-                classes = 'airplane'
-            elif lab == 1:
-                classes = 'car'
-            elif lab == 2:
-                classes = 'face'
+                classes = 'cat'
             else:
-                classes = 'motorbike'
+                classes = 'dog'
             cv2.imwrite(
                 OUTPUT_DIR +
                 '/' +
