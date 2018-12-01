@@ -9,7 +9,7 @@ def data_type():
     return tf.float32
 
 
-def inference(images, classes):
+def inference(images, classes, batch_size=32):
     """Build the AlexNet logs.
 
     Args:
@@ -128,7 +128,7 @@ def inference(images, classes):
 
     # fully 1
     with tf.name_scope('fc1') as scope:
-        reshape = tf.reshape(pool5, [64, -1])
+        reshape = tf.reshape(pool5, [batch_size, -1])
         dim = reshape.get_shape()[1].value
         kernel = tf.Variable(tf.truncated_normal(
             [dim, 4096]), name='weights')
@@ -155,7 +155,7 @@ def inference(images, classes):
     # fully 3
     with tf.name_scope('fc3') as scope:
         kernel = tf.Variable(tf.truncated_normal(
-            [4096, 4]), name='weights')
+            [4096, classes]), name='weights')
         biases = tf.Variable(tf.constant(0.1,
                                          shape=[classes],
                                          dtype=data_type()),

@@ -77,8 +77,8 @@ def read_and_decode(filename):
     features = tf.parse_single_example(
         serialized_example,
         features={
-            'label': tf.FixedLenFeature([], tf.int64),
-            'data': tf.FixedLenFeature([], tf.string)
+            'label': tf.FixedLenFeature([], tf.int32, default_value=0),
+            'data': tf.FixedLenFeature([], tf.string, default_value="")
         })
     label = features['label']
     data = features['data']
@@ -92,7 +92,7 @@ def main(_):
     num_examples = utils.sum_of_file(INPUT_DIR)
     print(f"Images total: {num_examples}.\n")
     print(f"Start create record!\n")
-    create_record()
+    # create_record()
     print(f"Record create successful.")
     batch = read_and_decode('cat_dogs.tfrecords')
     # Distributed tensorflow

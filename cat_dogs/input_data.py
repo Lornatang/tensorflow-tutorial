@@ -14,17 +14,11 @@ import tensorflow as tf
 
 input_dir = 'data'
 
-airplane = []
-airplane_label = []
+cat = []
+cat_label = []
 
-car = []
-car_label = []
-
-face = []
-face_label = []
-
-motorbike = []
-motorbike_label = []
+dog = []
+dog_label = []
 
 
 def convert_string_to_float(filename, label):
@@ -58,27 +52,19 @@ def get_files(file_dir):
         train_label:The train label for tensor
 
     """
-    for file in os.listdir(file_dir + '/airplane'):
-        airplane.append(file_dir + '/airplane' + '/' + file)
-        airplane_label.append(0)
-    for file in os.listdir(file_dir + '/car'):
-        car.append(file_dir + '/car' + '/' + file)
-        car_label.append(1)
-    for file in os.listdir(file_dir + '/face'):
-        face.append(file_dir + '/face' + '/' + file)
-        face_label.append(2)
-    for file in os.listdir(file_dir + '/motorbike'):
-        motorbike.append(file_dir + '/motorbike' + '/' + file)
-        motorbike_label.append(3)
+    for file in os.listdir(file_dir + '/cat'):
+        cat.append(file_dir + '/cat' + '/' + file)
+        cat_label.append(0)
+    for file in os.listdir(file_dir + '/dog'):
+        dog.append(file_dir + '/dog' + '/' + file)
+        dog_label.append(1)
 
     # Disarrange the generated image path and label List,
-    # and combine (airplane, car, face, motorbike) into a List (img and lab).
-    image_list = np.hstack((airplane, car, face, motorbike))
+    # and combine (cat, dog, face, motorbike) into a List (img and lab).
+    image_list = np.hstack((cat, dog))
     label_list = np.hstack(
-        (airplane_label,
-         car_label,
-         face_label,
-         motorbike_label))
+        (cat_label,
+         dog_label))
 
     # Shuffle the order
     temp = np.array([image_list, label_list])
@@ -100,7 +86,7 @@ def get_files(file_dir):
     return train_data, train_label
 
 
-def next_batch(image, label, batch_size=64):
+def next_batch(image, label, batch_size=32):
     """Set the batch size for the exercise.
 
     Args:

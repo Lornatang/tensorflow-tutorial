@@ -5,10 +5,10 @@ import model
 import numpy as np
 
 # parameters
-N_LABELS = 4
+N_LABELS = 2
 IMG_W = 224  # img size
 IMG_H = 224
-BATCH_SIZE = 64
+BATCH_SIZE = 32
 CAPACITY = 100
 MAX_STEP = 1000
 LEARNING_RATE = 0.0001
@@ -64,7 +64,7 @@ def main(_):
             if accuracy >= 0.999:
                 # Save logs
                 checkpoint_path = os.path.join(
-                    LOGS_DIRECTORY, 'logs.ckpt')
+                    LOGS_DIRECTORY, 'model.ckpt')
                 saver.save(sess, checkpoint_path, global_step=step)
                 break
         print(f"Model saved! Global step = {step}")
