@@ -1,6 +1,6 @@
 # Copy from google tutorials
 """
-  A test of mnist using the AlexNet model
+  A test of mnist using the AlexNet logs
 """
 
 import argparse
@@ -160,7 +160,7 @@ def main(_):
             dtype=data_type()))
 
     def model(data):
-        """The model definition"""
+        """The logs definition"""
         # Conv 1
         with tf.name_scope('conv1'):
             conv1 = tf.nn.conv2d(data,
