@@ -62,28 +62,29 @@ def read_and_decode(filename):
         filename: read image to tf queue path.
 
     Returns:
-        raw_data: image raw_data.
+        data: image raw_data.
         label:image label.
 
     """
+    # 创建文件队列,不限读取的数量
     filename_queue = tf.train.string_input_producer([filename])
     # create a reader from file queue
-    # reader = tf.data.TFRecordDataset
     reader = tf.TFRecordReader()
+    # reader从文件队列中读入一个序列化的样本
     _, serialized_example = reader.read(filename_queue)
     # get feature from serialized example
-    # Analyze symbolic samples
+    # 解析符号化的样本
     features = tf.parse_single_example(
         serialized_example,
         features={
-            'data': tf.FixedLenFeature([], tf.string),
-            'label': tf.FixedLenFeature([], tf.int64)
+            'label': tf.FixedLenFeature([], tf.int64),
+            'data': tf.FixedLenFeature([], tf.string)
         })
-    data = features['data']
     label = features['label']
+    data = features['data']
     data = tf.decode_raw(data, tf.uint8)
     data = tf.reshape(data, [224, 224, 3])
-    label = tf.cast(label, tf.int64)
+    label = tf.cast(label, tf.int32)
     return data, label
 
 
