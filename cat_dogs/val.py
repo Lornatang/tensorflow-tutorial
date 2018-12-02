@@ -47,7 +47,7 @@ def evaluate_one_image(data):
 
     logit = model.inference(image, N_CLASSES)
 
-    # logit = tf.nn.softmax(logit)
+    logit = tf.nn.softmax(logit)
 
     # you need to change the directories to yours.
     logs_train_dir = 'logs'
@@ -58,25 +58,21 @@ def evaluate_one_image(data):
             sess.run(tf.initializers.global_variables())
 
             print("Reading checkpoints...")
-            a = tf.train.latest_checkpoint('logs')
-            saver.restore(sess, a)
-            # ckpt = tf.train.get_checkpoint_state(logs_train_dir)
-            # if ckpt and ckpt.model_checkpoint_path:
-            #     global_step = ckpt.model_checkpoint_path.split(
-            #         '/')[-1].split('-')[-1]
-            #     saver.restore(sess, ckpt.model_checkpoint_path)
-            #     print('Loading success, global_step is %s' % global_step)
-            # else:
-            #     print('No checkpoint file found')
+            ckpt = tf.train.get_checkpoint_state(logs_train_dir)
+            if ckpt and ckpt.model_checkpoint_path:
+                global_step = ckpt.model_checkpoint_path.split(
+                    '/')[-1].split('-')[-1]
+                saver.restore(sess, ckpt.model_checkpoint_path)
+                print('Loading success, global_step is %s' % global_step)
+            else:
+                print('No checkpoint file found')
 
             prediction = sess.run(logit, feed_dict={X: data})
             prediction = np.argmax(prediction)
             if prediction == 0:
-                print(f"This is a cat with possibility  %.6f" %
-                      prediction[:, 0])
+                print(f"This is a cat with possibility  {prediction[:, 0]:.6f}")
             elif prediction == 1:
-                print(f'This is a dog with possibility %.6f' %
-                      prediction[:, 1])
+                print(f"This is a dog with possibility {prediction[:, 1]:.6f}")
 
 
 if __name__ == '__main__':
