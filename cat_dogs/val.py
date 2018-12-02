@@ -6,9 +6,10 @@ import model
 import input_data
 
 
-BATCH_SIZE = 32
+BATCH_SIZE = 1
 N_CLASSES = 2
 IMG_SIZE = 224
+N_CHANNELS = 3
 
 X = tf.placeholder(tf.float32, shape=[IMG_SIZE, IMG_SIZE, 3])
 
@@ -22,15 +23,11 @@ def get_one_image(filepath):
         image:  random read images from raw_data.
 
     """
-    # n = len(filepath)
-    # ind = np.random.randint(0, n)
-    # Randomly select the test images
-    # file = filepath[ind]
 
     data = cv2.imread(filepath)
     cv2.imshow('img', data)
     # cv2.waitKey(0)
-    data = cv2.resize(data, (224, 224))
+    data = cv2.resize(data, (IMG_SIZE, IMG_SIZE))
     image = np.array(data)
     return image
 
@@ -43,7 +40,7 @@ def evaluate_one_image(data):
     """
     image = tf.cast(data, tf.float32)
     image = tf.image.per_image_standardization(image)
-    image = tf.reshape(image, [1, 224, 224, 3])
+    image = tf.reshape(image, [BATCH_SIZE, IMG_SIZE, IMG_SIZE, N_CHANNELS])
 
     logit = model.inference(image, N_CLASSES)
 
