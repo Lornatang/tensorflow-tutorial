@@ -29,7 +29,7 @@ def get_one_image(filepath):
 
     data = cv2.imread(filepath)
     cv2.imshow('img', data)
-    cv2.waitKey(0)
+    # cv2.waitKey(0)
     data = cv2.resize(data, (224, 224))
     image = np.array(data)
     return image
@@ -52,20 +52,22 @@ def evaluate_one_image(data):
     # you need to change the directories to yours.
     logs_train_dir = 'logs'
 
-    saver = tf.train.Saver()
+    saver = tf.train.Saver(tf.global_variables())
 
     with tf.Session() as sess:
             sess.run(tf.initializers.global_variables())
 
             print("Reading checkpoints...")
-            ckpt = tf.train.get_checkpoint_state(logs_train_dir)
-            if ckpt and ckpt.model_checkpoint_path:
-                global_step = ckpt.model_checkpoint_path.split(
-                    '/')[-1].split('-')[-1]
-                saver.restore(sess, ckpt.model_checkpoint_path)
-                print('Loading success, global_step is %s' % global_step)
-            else:
-                print('No checkpoint file found')
+            a = tf.train.latest_checkpoint('logs')
+            saver.restore(sess, a)
+            # ckpt = tf.train.get_checkpoint_state(logs_train_dir)
+            # if ckpt and ckpt.model_checkpoint_path:
+            #     global_step = ckpt.model_checkpoint_path.split(
+            #         '/')[-1].split('-')[-1]
+            #     saver.restore(sess, ckpt.model_checkpoint_path)
+            #     print('Loading success, global_step is %s' % global_step)
+            # else:
+            #     print('No checkpoint file found')
 
             prediction = sess.run(logit, feed_dict={X: data})
             prediction = np.argmax(prediction)
