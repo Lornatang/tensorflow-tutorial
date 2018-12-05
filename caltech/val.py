@@ -41,46 +41,39 @@ def evaluate_one_image(data):
         data: image raw_data for array
 
     """
-    with tf.Graph().as_default():
-        image = tf.cast(data, tf.float32)
-        image = tf.image.per_image_standardization(image)
-        image = tf.reshape(image, [1, 224, 224, 3])
+    image = tf.cast(data, tf.float32)
+    image = tf.image.per_image_standardization(image)
+    image = tf.reshape(image, [1, 224, 224, 3])
 
-        logit = model.inference(image, N_CLASSES)
+    logit = model.inference(image, N_CLASSES, BATCH_SIZE)
 
-        # logit = tf.nn.softmax(logit)
+    logit = tf.nn.softmax(logit)
 
-        # you need to change the directories to yours.
-        logs_train_dir = 'logs'
+    # you need to change the directories to yours.
+    logs_train_dir = 'logs'
 
+    with tf.Session() as sess:
         saver = tf.train.Saver()
+        print("Reading checkpoints...")
+        ckpt = tf.train.get_checkpoint_state(logs_train_dir)
+        if ckpt and ckpt.model_checkpoint_path:
+            global_step = ckpt.model_checkpoint_path.split(
+                '/')[-1].split('-')[-1]
+            saver.restore(sess, ckpt.model_checkpoint_path)
+            print('Loading success, global_step is %s' % global_step)
+        else:
+            print('No checkpoint file found')
 
-        with tf.Session() as sess:
-
-            print("Reading checkpoints...")
-            ckpt = tf.train.get_checkpoint_state(logs_train_dir)
-            if ckpt and ckpt.model_checkpoint_path:
-                global_step = ckpt.model_checkpoint_path.split(
-                    '/')[-1].split('-')[-1]
-                saver.restore(sess, ckpt.model_checkpoint_path)
-                print('Loading success, global_step is %s' % global_step)
-            else:
-                print('No checkpoint file found')
-
-            prediction = sess.run(logit, feed_dict={X: data})
-            prediction = np.argmax(prediction)
-            if prediction == 0:
-                print(f"This is a airplane with possibility  %.6f" %
-                      prediction[:, 0])
-            elif prediction == 1:
-                print(f'This is a car with possibility %.6f' %
-                      prediction[:, 1])
-            elif prediction == 2:
-                print(f'This is a face with possibility %.6f' %
-                      prediction[:, 2])
-            else:
-                print(f'This is a motorbike with possibility %.6f' %
-                      prediction[:, 3])
+        prediction = sess.run(logit, feed_dict={X: data})
+        prediction = np.argmax(prediction)
+        if prediction == 0:
+            print(f"This is a airplane with possibility {prediction[:, 0]}")
+        elif prediction == 1:
+            print(f'This is a car with possibility')
+        elif prediction == 2:
+            print(f'This is a face with possibility')
+        else:
+            print(f'This is a motorbike with possibility')
 
 
 if __name__ == '__main__':

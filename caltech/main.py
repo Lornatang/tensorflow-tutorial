@@ -27,7 +27,7 @@ def main(_):
     )
 
     # define train op
-    train_logits = model.inference(train_batch, N_LABELS)
+    train_logits = model.inference(train_batch, N_LABELS, BATCH_SIZE)
     train_loss = model.losses(train_logits, train_label_batch)
     train_op = model.optimization(train_loss, LEARNING_RATE)
     train_acc = model.evaluation(train_logits, train_label_batch)
@@ -64,7 +64,7 @@ def main(_):
             if accuracy >= 0.999:
                 # Save logs
                 checkpoint_path = os.path.join(
-                    LOGS_DIRECTORY, 'logs.ckpt')
+                    LOGS_DIRECTORY, 'model.ckpt')
                 saver.save(sess, checkpoint_path, global_step=step)
                 break
         print(f"Model saved! Global step = {step}")
