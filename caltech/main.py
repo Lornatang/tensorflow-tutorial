@@ -58,7 +58,7 @@ def main(_):
             # print and write to logs.
             if step % 2 == 0:
                 print(
-                    f"Step [{step}/{MAX_STEP}] Loss {loss:.6f} Accuracy {accuracy * 100.0:.2f}%")
+                    f"Step [{step}/{MAX_STEP}] Loss {loss} Accuracy {accuracy * 100.0:.2f}%")
                 summary_str = sess.run(summary_op)
                 train_writer.add_summary(summary_str, step)
             if step == MAX_STEP:
