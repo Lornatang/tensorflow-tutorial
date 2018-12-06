@@ -1,12 +1,5 @@
 import tensorflow as tf
-
-
-def print_activations(t):
-    print(t.op.name, f" {t.get_shape().as_list()}")
-
-
-def data_type():
-    return tf.float32
+import utils
 
 
 def inference(images, classes, batch_size):
@@ -28,11 +21,11 @@ def inference(images, classes, batch_size):
         conv = tf.nn.conv2d(images, kernel, [1, 4, 4, 1], padding='SAME')
         biases = tf.Variable(tf.constant(0.1,
                                          shape=[64],
-                                         dtype=data_type()),
+                                         dtype=utils.data_type()),
                              name='biases')
         bias = tf.nn.bias_add(conv, biases)
         conv1 = tf.nn.relu(bias, name=scope)
-        print_activations(conv1)
+        utils.print_activations(conv1)
 
     # lrn1
     with tf.name_scope('lrn1') as scope:
@@ -49,7 +42,7 @@ def inference(images, classes, batch_size):
                            strides=[1, 2, 2, 1],
                            padding='VALID',
                            name='pool1')
-    print_activations(pool1)
+    utils.print_activations(pool1)
 
     # conv2
     with tf.name_scope('conv2') as scope:
@@ -58,11 +51,11 @@ def inference(images, classes, batch_size):
         conv = tf.nn.conv2d(pool1, kernel, [1, 1, 1, 1], padding='SAME')
         biases = tf.Variable(tf.constant(0.1,
                                          shape=[192],
-                                         dtype=data_type()),
+                                         dtype=utils.data_type()),
                              name='biases')
         bias = tf.nn.bias_add(conv, biases)
         conv2 = tf.nn.relu(bias, name=scope)
-    print_activations(conv2)
+    utils.print_activations(conv2)
 
     # lrn2
     with tf.name_scope('lrn2') as scope:
@@ -78,7 +71,7 @@ def inference(images, classes, batch_size):
                            strides=[1, 2, 2, 1],
                            padding='VALID',
                            name='pool2')
-    print_activations(pool2)
+    utils.print_activations(pool2)
 
     # conv3
     with tf.name_scope('conv3') as scope:
@@ -87,11 +80,11 @@ def inference(images, classes, batch_size):
         conv = tf.nn.conv2d(pool2, kernel, [1, 1, 1, 1], padding='SAME')
         biases = tf.Variable(tf.constant(0.1,
                                          shape=[384],
-                                         dtype=data_type()),
+                                         dtype=utils.data_type()),
                              name='biases')
         bias = tf.nn.bias_add(conv, biases)
         conv3 = tf.nn.relu(bias, name=scope)
-        print_activations(conv3)
+        utils.print_activations(conv3)
 
     # conv4
     with tf.name_scope('conv4') as scope:
@@ -100,11 +93,11 @@ def inference(images, classes, batch_size):
         conv = tf.nn.conv2d(conv3, kernel, [1, 1, 1, 1], padding='SAME')
         biases = tf.Variable(tf.constant(0.1,
                                          shape=[256],
-                                         dtype=data_type()),
+                                         dtype=utils.data_type()),
                              name='biases')
         bias = tf.nn.bias_add(conv, biases)
         conv4 = tf.nn.relu(bias, name=scope)
-        print_activations(conv4)
+        utils.print_activations(conv4)
 
     # conv5
     with tf.name_scope('conv5') as scope:
@@ -113,11 +106,11 @@ def inference(images, classes, batch_size):
         conv = tf.nn.conv2d(conv4, kernel, [1, 1, 1, 1], padding='SAME')
         biases = tf.Variable(tf.constant(0.1,
                                          shape=[256],
-                                         dtype=data_type()),
+                                         dtype=utils.data_type()),
                              name='biases')
         bias = tf.nn.bias_add(conv, biases)
         conv5 = tf.nn.relu(bias, name=scope)
-        print_activations(conv5)
+        utils.print_activations(conv5)
 
     # pool5
     pool5 = tf.nn.max_pool(conv5,
@@ -125,7 +118,7 @@ def inference(images, classes, batch_size):
                            strides=[1, 2, 2, 1],
                            padding='VALID',
                            name='pool5')
-    print_activations(pool5)
+    utils.print_activations(pool5)
 
     # fully 1
     with tf.name_scope('fc1') as scope:
@@ -135,7 +128,7 @@ def inference(images, classes, batch_size):
             [dim, 4096]), name='weights')
         biases = tf.Variable(tf.constant(0.1,
                                          shape=[4096],
-                                         dtype=data_type()),
+                                         dtype=utils.data_type()),
                              name='biases')
         fc1 = tf.nn.relu(tf.matmul(reshape, kernel) + biases)
 
@@ -145,7 +138,7 @@ def inference(images, classes, batch_size):
             [4096, 4096]), name='weights')
         biases = tf.Variable(tf.constant(0.1,
                                          shape=[4096],
-                                         dtype=data_type()),
+                                         dtype=utils.data_type()),
                              name='biases')
         fc2 = tf.nn.relu(tf.matmul(fc1, kernel) + biases)
 
@@ -155,7 +148,7 @@ def inference(images, classes, batch_size):
             [4096, classes]), name='weights')
         biases = tf.Variable(tf.constant(0.1,
                                          shape=[classes],
-                                         dtype=data_type()),
+                                         dtype=utils.data_type()),
                              name='biases')
         out = tf.add(tf.matmul(fc2, kernel), biases)
 
