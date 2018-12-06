@@ -10,7 +10,7 @@ IMG_W = 224  # img size
 IMG_H = 224
 BATCH_SIZE = 64
 CAPACITY = 100
-MAX_STEP = 1000
+MAX_STEP = 500
 LEARNING_RATE = 0.0001
 
 # define train data dir and logs dir
@@ -61,7 +61,7 @@ def main(_):
                     f"Step [{step}/{MAX_STEP}] Loss {loss:.6f} Accuracy {accuracy * 100.0:.2f}%")
                 summary_str = sess.run(summary_op)
                 train_writer.add_summary(summary_str, step)
-            if accuracy >= 0.999:
+            if step == MAX_STEP:
                 # Save logs
                 checkpoint_path = os.path.join(
                     LOGS_DIRECTORY, 'model.ckpt')

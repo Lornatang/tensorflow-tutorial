@@ -65,19 +65,19 @@ def evaluate_one_image(data):
             print('No checkpoint file found')
 
         prediction = sess.run(logit, feed_dict={X: data})
-        prediction = np.argmax(prediction)
-        if prediction == 0:
-            print(f"This is a airplane with possibility {prediction[:, 0]}")
-        elif prediction == 1:
-            print(f'This is a car with possibility')
-        elif prediction == 2:
-            print(f'This is a face with possibility')
+        index = np.argmax(prediction)
+        if index == 0:
+            print("This is a airplane")
+        elif index == 1:
+            print("This is a car")
+        elif index == 2:
+            print("This is a face")
         else:
-            print(f'This is a motorbike with possibility')
+            print("This is a motorbike")
 
 
 if __name__ == '__main__':
     train_dir = 'data'
     val, val_label = input_data.get_files(train_dir)
-    img = get_one_image('/Users/mac/Desktop/moto.jpg')
+    img = get_one_image('/Users/mac/Desktop/airplane.jpg')
     evaluate_one_image(img)
