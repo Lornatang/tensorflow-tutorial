@@ -42,7 +42,7 @@ def evaluate_one_image(data):
     image = tf.image.per_image_standardization(image)
     image = tf.reshape(image, [BATCH_SIZE, IMG_SIZE, IMG_SIZE, N_CHANNELS])
 
-    logit = model.inference(image, N_CLASSES)
+    logit = model.inference(image, N_CLASSES, BATCH_SIZE)
 
     logit = tf.nn.softmax(logit)
 

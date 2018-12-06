@@ -2,7 +2,7 @@ import tensorflow as tf
 import utils
 
 
-def inference(images, classes, batch_size=32):
+def inference(images, classes, batch_size):
     """Build the AlexNet logs.
 
     Args:

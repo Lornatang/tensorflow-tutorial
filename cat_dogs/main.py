@@ -9,7 +9,6 @@ N_LABELS = 2
 IMG_W = 224  # img size
 IMG_H = 224
 BATCH_SIZE = 32
-CAPACITY = 100
 MAX_STEP = 1000
 LEARNING_RATE = 0.0001
 
@@ -27,7 +26,7 @@ def main(_):
     )
 
     # define train op
-    train_logits = model.inference(train_batch, N_LABELS)
+    train_logits = model.inference(train_batch, N_LABELS, BATCH_SIZE)
     train_loss = model.losses(train_logits, train_label_batch)
     train_op = model.optimization(train_loss, LEARNING_RATE)
     train_acc = model.evaluation(train_logits, train_label_batch)
@@ -45,7 +44,6 @@ def main(_):
 
     # queue monitor
     coord = tf.train.Coordinator()
-    threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
     # train
     try:
